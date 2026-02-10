@@ -37,6 +37,13 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     }
 
     @Override
+    public void deleteByMenuId(Long menuId) {
+        LambdaQueryWrapper<SysRoleMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysRoleMenu::getMenuId, menuId);
+        remove(wrapper);
+    }
+
+    @Override
     public void saveRoleMenu(Long roleId, Long menuId) {
         SysRoleMenu roleMenu = new SysRoleMenu();
         roleMenu.setRoleId(roleId);

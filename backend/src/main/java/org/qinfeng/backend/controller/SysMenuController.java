@@ -102,6 +102,75 @@ public class SysMenuController {
     }
 
     /**
+     * 根据ID获取菜单详情
+     */
+    @GetMapping("/{id}")
+    public Result<SysMenu> getMenuById(@PathVariable Long id) {
+        SysMenu menu = sysMenuService.getById(id);
+        return Result.success(menu);
+    }
+
+    /**
+     * 新增菜单
+     */
+    @PostMapping
+    public Result<Void> addMenu(@RequestBody SysMenu menu) {
+        // 处理 parentId，null 或 0 表示顶级菜单
+        if (menu.getParentId() == null) {
+            menu.setParentId(0L);
+        }
+
+        boolean success = sysMenuService.save(menu);
+        if (success) {
+            return Result.success("新增成功");
+        } else {
+            return Result.error("新增失败");
+        }
+    }
+
+    /**
+     * 更新菜单
+     */
+    @PutMapping
+    public Result<Void> updateMenu(@RequestBody SysMenu menu) {
+        // 处理 parentId，null 或 0 表示顶级菜单
+        if (menu.getParentId() == null) {
+            menu.setParentId(0L);
+        }
+
+        boolean success = sysMenuService.updateById(menu);
+        if (success) {
+            return Result.success("更新成功");
+        } else {
+            return Result.error("更新失败");
+        }
+    }
+
+    /**
+     * 删除菜单
+     */
+    @DeleteMapping("/{id}")
+    public Result<Void> deleteMenu(@PathVariable Long id) {
+        // 检查是否有子菜单
+        LambdaQueryWrapper<SysMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysMenu::getParentId, id);
+        long count = sysMenuService.count(wrapper);
+        if (count > 0) {
+            return Result.error("请先删除子菜单");
+        }
+
+        // 删除角色菜单关联
+        sysRoleMenuService.deleteByMenuId(id);
+
+        boolean success = sysMenuService.removeById(id);
+        if (success) {
+            return Result.success("删除成功");
+        } else {
+            return Result.error("删除失败");
+        }
+    }
+
+    /**
      * 获取角色的菜单ID列表
      */
     @GetMapping("/{roleId}/menus")

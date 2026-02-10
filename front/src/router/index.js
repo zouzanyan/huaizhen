@@ -31,15 +31,10 @@ const routes = [
         component: () => import('../views/RoleManagement.vue')
       },
       {
-        path: 'system/log/access',
-        name: 'AccessLog',
-        component: () => import('../views/AccessLog.vue')
+        path: 'system/menu',
+        name: 'MenuManagement',
+        component: () => import('../views/MenuManagement.vue')
       },
-      {
-        path: 'system/log/operation',
-        name: 'OperationLog',
-        component: () => import('../views/OperationLog.vue')
-      }
     ]
   }
 ]

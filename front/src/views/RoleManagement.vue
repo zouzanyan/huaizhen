@@ -84,6 +84,7 @@
             show-checkbox
             default-expand-all
             :default-checked-keys="checkedMenuIds"
+            check-strictly
             style="border: 1px solid #dcdfe6; padding: 10px; border-radius: 4px;"
           />
         </el-form-item>
@@ -247,9 +248,15 @@ const handleAssignMenus = async (row) => {
 
 // 提交菜单配置
 const handleMenuSubmit = async () => {
-  const keys = menuTreeRef.value?.getCheckedKeys() || []
+  // 获取所有选中的节点（包括父节点）
+  const checkedKeys = menuTreeRef.value?.getCheckedKeys(false) || []
+  // 获取半选中的父节点（子节点被选中但父节点未明确勾选的情况）
+  const halfCheckedKeys = menuTreeRef.value?.getHalfCheckedKeys() || []
+  // 合并所有需要关联的菜单ID
+  const allKeys = [...checkedKeys, ...halfCheckedKeys]
+
   try {
-    const res = await menuService.assignRoleMenus(currentRole.value.id, keys)
+    const res = await menuService.assignRoleMenus(currentRole.value.id, allKeys)
     if (res.code === 200) {
       ElMessage.success('菜单权限配置成功')
       menuDialogVisible.value = false

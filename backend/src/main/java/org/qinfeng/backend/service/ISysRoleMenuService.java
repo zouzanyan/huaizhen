@@ -31,6 +31,13 @@ public interface ISysRoleMenuService extends IService<SysRoleMenu> {
     void deleteByRoleId(Long roleId);
 
     /**
+     * 根据菜单ID删除角色菜单关联
+     *
+     * @param menuId 菜单ID
+     */
+    void deleteByMenuId(Long menuId);
+
+    /**
      * 保存角色菜单关联
      *
      * @param roleId 角色ID

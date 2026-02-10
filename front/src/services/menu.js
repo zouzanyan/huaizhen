@@ -37,6 +37,52 @@ class MenuService {
   }
 
   /**
+   * 根据ID获取菜单详情
+   * @param {Number} id 菜单ID
+   */
+  getMenuById(id) {
+    return request({
+      url: `${API_URL}/${id}`,
+      method: 'get'
+    })
+  }
+
+  /**
+   * 新增菜单
+   * @param {Object} data 菜单数据
+   */
+  addMenu(data) {
+    return request({
+      url: API_URL,
+      method: 'post',
+      data
+    })
+  }
+
+  /**
+   * 更新菜单
+   * @param {Object} data 菜单数据
+   */
+  updateMenu(data) {
+    return request({
+      url: API_URL,
+      method: 'put',
+      data
+    })
+  }
+
+  /**
+   * 删除菜单
+   * @param {Number} id 菜单ID
+   */
+  deleteMenu(id) {
+    return request({
+      url: `${API_URL}/${id}`,
+      method: 'delete'
+    })
+  }
+
+  /**
    * 获取角色的菜单ID列表
    * @param {Number} roleId 角色ID
    */
