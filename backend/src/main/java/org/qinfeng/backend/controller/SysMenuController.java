@@ -117,7 +117,7 @@ public class SysMenuController {
     public Result<Void> addMenu(@RequestBody SysMenu menu) {
         // 处理 parentId，null 或 0 表示顶级菜单
         if (menu.getParentId() == null) {
-            menu.setParentId(0L);
+            menu.setParentId(null);
         }
 
         boolean success = sysMenuService.save(menu);
