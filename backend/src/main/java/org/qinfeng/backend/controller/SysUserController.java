@@ -7,6 +7,7 @@ import org.qinfeng.backend.dto.PageQuery;
 import org.qinfeng.backend.dto.UserDTO;
 import org.qinfeng.backend.entity.SysRole;
 import org.qinfeng.backend.entity.SysUser;
+import org.qinfeng.backend.security.JwtUser;
 import org.qinfeng.backend.service.ISysRoleService;
 import org.qinfeng.backend.service.ISysUserRoleService;
 import org.qinfeng.backend.service.ISysUserService;
@@ -15,9 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * 系统用户管理控制器
@@ -40,6 +44,41 @@ public class SysUserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    /**
+     * 获取当前登录用户信息
+     */
+    @GetMapping("/profile")
+    public Result<SysUser> getCurrentUserProfile() {
+        // 从 SecurityContext 获取当前用户
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SysUser user = jwtUser.getUser();
+
+        // 隐藏密码
+        user.setPasswordHash(null);
+
+        return Result.success(user);
+    }
+
+    /**
+     * 获取当前登录用户的角色信息
+     */
+    @GetMapping("/profile/roles")
+    public Result<List<SysRole>> getCurrentUserProfileRoles() {
+        // 从 SecurityContext 获取当前用户
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = jwtUser.getUserId();
+
+        // 获取用户的角色ID列表
+        List<Long> roleIds = sysUserRoleService.getRoleIdsByUserId(userId);
+        if (roleIds == null || roleIds.isEmpty()) {
+            return Result.success(Collections.emptyList());
+        }
+
+        // 获取角色信息
+        List<SysRole> roles = sysRoleService.listByIds(roleIds);
+        return Result.success(roles);
+    }
 
     /**
      * 分页查询用户列表

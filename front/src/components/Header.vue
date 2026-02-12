@@ -19,7 +19,7 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>
+            <el-dropdown-item command="profile">
               <el-icon><User /></el-icon>
               个人信息
             </el-dropdown-item>
@@ -55,7 +55,10 @@ const router = useRouter()
 const username = ref('')
 
 const handleCommand = async (command: string) => {
-  if (command === 'logout') {
+  if (command === 'profile') {
+    // 跳转到个人信息页面
+    router.push('/profile')
+  } else if (command === 'logout') {
     try {
       await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
         confirmButtonText: '确定',
@@ -82,8 +85,8 @@ const handleCommand = async (command: string) => {
 }
 
 onMounted(() => {
-  // 这里可以从 JWT 中解析用户名
-  username.value = '管理员'
+  // 从 JWT 中解析用户名
+  username.value = auth.getUsername() || '管理员'
 })
 </script>
 

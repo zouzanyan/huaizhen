@@ -61,6 +61,23 @@ class AuthService {
       return false
     }
   }
+
+  // 从 JWT 中解析用户名
+  getUsername() {
+    const token = this.getToken()
+    if (!token) {
+      return null
+    }
+
+    try {
+      const payload = token.split('.')[1]
+      const decoded = JSON.parse(atob(payload))
+      return decoded.username || null
+    } catch (error) {
+      console.error('解析用户名失败:', error)
+      return null
+    }
+  }
 }
 
 export default new AuthService()
