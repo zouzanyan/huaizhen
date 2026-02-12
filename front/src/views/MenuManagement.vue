@@ -228,7 +228,7 @@ const getMenuList = async () => {
 }
 
 // 构建菜单树
-const buildMenuTree = (menus, parentId = null) => {
+const buildMenuTree = (menus, parentId = 0) => {
   const result = []
   for (const menu of menus) {
     if (menu.parentId === parentId) {
@@ -245,7 +245,7 @@ const buildMenuTree = (menus, parentId = null) => {
 }
 
 // 构建菜单树选项（用于上级菜单选择）
-const buildMenuTreeOptions = (menus, parentId = null) => {
+const buildMenuTreeOptions = (menus, parentId = 0) => {
   const result = []
   for (const menu of menus) {
     if (menu.parentId === parentId) {

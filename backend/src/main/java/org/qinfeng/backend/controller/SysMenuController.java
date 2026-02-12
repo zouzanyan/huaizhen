@@ -44,7 +44,7 @@ public class SysMenuController {
         wrapper.eq(SysMenu::getStatus, 1);
         wrapper.orderByAsc(SysMenu::getOrderNo);
         List<SysMenu> menus = sysMenuService.list(wrapper);
-        List<MenuTreeVO> menuTree = buildMenuTree(menus, null);
+        List<MenuTreeVO> menuTree = buildMenuTree(menus, 0L);
         return Result.success(menuTree);
     }
 
@@ -85,7 +85,7 @@ public class SysMenuController {
         List<SysMenu> menus = sysMenuService.list(wrapper);
 
         // 构建菜单树
-        List<MenuTreeVO> menuTree = buildMenuTree(menus, null);
+        List<MenuTreeVO> menuTree = buildMenuTree(menus, 0L);
         return Result.success(menuTree);
     }
 
@@ -116,12 +116,14 @@ public class SysMenuController {
     @PostMapping
     public Result<Void> addMenu(@RequestBody SysMenu menu) {
         // 处理 parentId，null 或 0 表示顶级菜单
-        if (menu.getParentId() == null) {
-            menu.setParentId(null);
-        }
+        // if (menu.getParentId() == 0) {
+        //     menu.setParentId(0L);
+        // }
 
         boolean success = sysMenuService.save(menu);
         if (success) {
+            // 新增菜单成功后，默认给管理员（角色ID=1）添加该菜单权限
+            sysRoleMenuService.saveRoleMenu(1L, menu.getId());
             return Result.success("新增成功");
         } else {
             return Result.error("新增失败");
@@ -134,9 +136,9 @@ public class SysMenuController {
     @PutMapping
     public Result<Void> updateMenu(@RequestBody SysMenu menu) {
         // 处理 parentId，null 或 0 表示顶级菜单
-        if (menu.getParentId() == null) {
-            menu.setParentId(null);
-        }
+        // if (menu.getParentId() == 0) {
+        //     menu.setParentId(0L);
+        // }
 
         boolean success = sysMenuService.updateById(menu);
         if (success) {
