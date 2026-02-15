@@ -92,15 +92,46 @@ const handleSubmit = async (e) => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3d7a9e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.02) 50%, transparent 70%);
+  background-size: 100% 100%, 100% 100%, 200% 200%;
+  animation: backgroundMove 20s ease-in-out infinite;
+}
+
+@keyframes backgroundMove {
+  0%, 100% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  50% {
+    background-position: 0 0, 0 0, 50% 50%;
+  }
 }
 
 .login-card {
-  width: 400px;
-  padding: 30px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 420px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 12px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
 }
 
 .login-card h2 {
@@ -122,37 +153,51 @@ const handleSubmit = async (e) => {
 
 .form-input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 15px;
   box-sizing: border-box;
-  transition: border-color 0.3s;
+  transition: all 0.3s ease;
+  background: #f8f9fb;
+  color: #2c3e50;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #409eff;
+  border-color: #2a5298;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
 }
 
 .login-button {
   width: 100%;
-  padding: 12px;
-  background: #409eff;
+  padding: 14px;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
 }
 
 .login-button:hover:not(:disabled) {
-  background: #66b1ff;
+  background: linear-gradient(135deg, #2a5298 0%, #3d7a9e 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .login-button:disabled {
   background: #a0cfff;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 </style>
