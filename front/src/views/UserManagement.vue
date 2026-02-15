@@ -78,13 +78,30 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item
+          v-if="!form.id"
+          label="密码"
+          prop="password"
+        >
           <el-input
             v-model="form.password"
             type="password"
             placeholder="请输入密码"
             show-password
           />
+        </el-form-item>
+        <el-form-item
+          v-else
+          label="密码"
+          prop="password"
+        >
+          <el-input
+            v-model="form.password"
+            type="password"
+            placeholder="不填写则不修改密码"
+            show-password
+          />
+          <div class="form-tip">编辑时留空则不修改密码</div>
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -155,21 +172,32 @@ const formRef = ref(null)
 const form = reactive({
   id: null,
   username: '',
-  password: '',
+  password: null,
   status: 1
 })
 
-const formRules = {
+const formRules = computed(() => ({
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' }
   ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
-  ],
+  password: getPasswordRules(),
   status: [
     { required: true, message: '请选择状态', trigger: 'change' }
   ]
+}))
+
+// 动态生成密码验证规则
+const getPasswordRules = () => {
+  // 新增用户时，密码必填
+  // 编辑用户时，密码可选（如果不填写则不修改密码）
+  if (!form.id) {
+    return [
+      { required: true, message: '请输入密码', trigger: 'blur' },
+      { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+    ]
+  }
+  // 编辑用户时，密码可选
+  return []
 }
 
 const roleDialogVisible = ref(false)
@@ -221,7 +249,7 @@ const handlePageChange = () => {
 const handleAdd = () => {
   form.id = null
   form.username = ''
-  form.password = ''
+  form.password = null
   form.status = 1
   dialogVisible.value = true
 }
@@ -230,7 +258,7 @@ const handleAdd = () => {
 const handleEdit = (row) => {
   form.id = row.id
   form.username = row.username
-  form.password = ''
+  form.password = null  // 编辑时密码初始化为空，不修改密码
   form.status = row.status
   dialogVisible.value = true
 }
@@ -260,27 +288,20 @@ const handleSubmit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        // 编辑时密码可以为空
-        if (form.id && !form.password) {
-          const { password, ...data } = form
-          const res = await userService.updateUser(data)
-          if (res.code === 200) {
-            ElMessage.success('更新成功')
-            dialogVisible.value = false
-            getUserList()
-          } else {
-            ElMessage.error(res.message || '更新失败')
-          }
+        // 编辑用户且密码为空时，不传递密码字段
+        let submitData = { ...form }
+        if (form.id && !submitData.password) {
+          delete submitData.password
+        }
+
+        const api = form.id ? userService.updateUser : userService.addUser
+        const res = await api(submitData)
+        if (res.code === 200) {
+          ElMessage.success(form.id ? '更新成功' : '新增成功')
+          dialogVisible.value = false
+          getUserList()
         } else {
-          const api = form.id ? userService.updateUser : userService.addUser
-          const res = await api(form)
-          if (res.code === 200) {
-            ElMessage.success(form.id ? '更新成功' : '新增成功')
-            dialogVisible.value = false
-            getUserList()
-          } else {
-            ElMessage.error(res.message || '操作失败')
-          }
+          ElMessage.error(res.message || '操作失败')
         }
       } catch (error) {
         ElMessage.error(error.message || '操作失败')
@@ -391,5 +412,11 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.form-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
 }
 </style>
