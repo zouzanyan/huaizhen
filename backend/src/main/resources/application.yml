@@ -9,4 +9,7 @@ spring:
 
 jwt:
   secret: yourSecretKeyHere123456789892435682439065802934658
-  expiration: 3600000  # 1小时（毫秒）
+  expiration: 36000000  # 10小时（毫秒）
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

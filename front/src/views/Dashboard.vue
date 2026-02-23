@@ -2,7 +2,7 @@
   <div class="dashboard">
     <div class="page-header">
       <h2 class="page-title">仪表盘</h2>
-      <p class="page-subtitle">系统概览</p>
+      <p class="page-subtitle">论坛数据概览</p>
     </div>
 
     <el-row :gutter="20" class="stats-row">
@@ -10,11 +10,11 @@
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon primary">
-              <el-icon><User /></el-icon>
+              <el-icon><ChatDotRound /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">1,234</div>
-              <div class="stat-label">总用户数</div>
+              <div class="stat-value">{{ stats.totalPosts || 0 }}</div>
+              <div class="stat-label">总帖子数</div>
             </div>
           </div>
         </el-card>
@@ -24,11 +24,11 @@
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon success">
-              <el-icon><DocumentChecked /></el-icon>
+              <el-icon><User /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">567</div>
-              <div class="stat-label">今日访问</div>
+              <div class="stat-value">{{ stats.totalUsers || 0 }}</div>
+              <div class="stat-label">总用户数</div>
             </div>
           </div>
         </el-card>
@@ -38,11 +38,11 @@
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon warning">
-              <el-icon><Timer /></el-icon>
+              <el-icon><FolderOpened /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">89</div>
-              <div class="stat-label">待处理事项</div>
+              <div class="stat-value">{{ stats.totalForums || 0 }}</div>
+              <div class="stat-label">版块数量</div>
             </div>
           </div>
         </el-card>
@@ -52,11 +52,11 @@
         <el-card class="stat-card">
           <div class="stat-content">
             <div class="stat-icon danger">
-              <el-icon><Warning /></el-icon>
+              <el-icon><DocumentCopy /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">3</div>
-              <div class="stat-label">系统告警</div>
+              <div class="stat-value">{{ stats.activePosts || 0 }}</div>
+              <div class="stat-label">正常帖子</div>
             </div>
           </div>
         </el-card>
@@ -68,18 +68,16 @@
         <el-card>
           <template #header>
             <div class="card-header">
-              <span>最近登录</span>
+              <span>最新帖子</span>
             </div>
           </template>
-          <el-table :data="loginData" style="width: 100%">
-            <el-table-column prop="username" label="用户名" width="120" />
-            <el-table-column prop="ip" label="IP地址" width="140" />
-            <el-table-column prop="time" label="登录时间" />
-            <el-table-column prop="status" label="状态" width="80">
+          <el-table :data="recentPosts" style="width: 100%" v-loading="postsLoading">
+            <el-table-column prop="title" label="标题" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="authorName" label="作者" width="100" />
+            <el-table-column prop="forumName" label="版块" width="100" />
+            <el-table-column prop="createdAt" label="发布时间" width="160">
               <template #default="{ row }">
-                <el-tag :type="row.status === '成功' ? 'success' : 'danger'">
-                  {{ row.status }}
-                </el-tag>
+                {{ formatDateTime(row.createdAt) }}
               </template>
             </el-table-column>
           </el-table>
@@ -90,54 +88,125 @@
         <el-card>
           <template #header>
             <div class="card-header">
-              <span>系统通知</span>
+              <span>活跃用户</span>
             </div>
           </template>
-          <el-timeline>
-            <el-timeline-item
-              v-for="(item, index) in notifications"
-              :key="index"
-              :type="item.type"
-              :timestamp="item.time"
-            >
-              {{ item.content }}
-            </el-timeline-item>
-          </el-timeline>
+          <el-table :data="activeUsers" style="width: 100%" v-loading="usersLoading">
+            <el-table-column prop="username" label="用户名" width="120" />
+            <el-table-column prop="nickname" label="昵称" min-width="120" show-overflow-tooltip />
+            <el-table-column prop="role" label="角色" width="80">
+              <template #default="{ row }">
+                <el-tag :type="row.role === 1 ? 'warning' : 'info'" size="small">
+                  {{ row.role === 1 ? '管理员' : '用户' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" width="80">
+              <template #default="{ row }">
+                <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
+                  {{ row.status === 1 ? '正常' : '已封禁' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
 
-<script setup lang="ts">
-import { User, DocumentChecked, Timer, Warning } from '@element-plus/icons-vue'
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { ChatDotRound, User, FolderOpened, DocumentCopy } from '@element-plus/icons-vue'
+import forumPostService from '@/services/forumPost'
+import forumUserService from '@/services/forumUser'
+import forumBoardService from '@/services/forumBoard'
 
-interface LoginRecord {
-  username: string
-  ip: string
-  time: string
-  status: string
+const stats = reactive({
+  totalPosts: 0,
+  totalUsers: 0,
+  totalForums: 0,
+  activePosts: 0
+})
+
+const recentPosts = ref([])
+const activeUsers = ref([])
+const postsLoading = ref(false)
+const usersLoading = ref(false)
+
+const formatDateTime = (dateStr) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleString('zh-CN')
 }
 
-interface Notification {
-  content: string
-  time: string
-  type: 'primary' | 'success' | 'warning' | 'danger'
+const loadStats = async () => {
+  try {
+    const [postsRes, usersRes, forumsRes] = await Promise.all([
+      forumPostService.getPostStats(),
+      forumUserService.getUserStats(),
+      forumBoardService.getBoardStats()
+    ])
+
+    if (postsRes.code === 200) {
+      stats.totalPosts = postsRes.data.totalPosts || 0
+      stats.activePosts = postsRes.data.activePosts || 0
+    }
+
+    if (usersRes.code === 200) {
+      stats.totalUsers = usersRes.data.totalUsers || 0
+    }
+
+    if (forumsRes.code === 200) {
+      stats.totalForums = forumsRes.data.totalForums || 0
+    }
+  } catch (error) {
+    console.error('加载统计数据失败:', error)
+  }
 }
 
-const loginData: LoginRecord[] = [
-  { username: 'admin', ip: '192.168.1.100', time: '2024-01-15 10:30:00', status: '成功' },
-  { username: 'user01', ip: '192.168.1.101', time: '2024-01-15 10:28:00', status: '成功' },
-  { username: 'user02', ip: '192.168.1.102', time: '2024-01-15 10:25:00', status: '失败' },
-  { username: 'user03', ip: '192.168.1.103', time: '2024-01-15 10:20:00', status: '成功' },
-]
+const loadRecentPosts = async () => {
+  postsLoading.value = true
+  try {
+    const res = await forumPostService.getPostList({
+      page: 1,
+      size: 5,
+      status: 1  // 只显示正常状态的帖子
+    })
+    if (res.code === 200) {
+      recentPosts.value = res.data.list || []
+    }
+  } catch (error) {
+    ElMessage.error('加载最新帖子失败')
+  } finally {
+    postsLoading.value = false
+  }
+}
 
-const notifications: Notification[] = [
-  { content: '系统升级成功，版本 v2.1.0', time: '2024-01-15 09:00', type: 'success' },
-  { content: '发现异常登录，请及时检查', time: '2024-01-14 18:30', type: 'warning' },
-  { content: '数据库备份已完成', time: '2024-01-14 02:00', type: 'primary' },
-  { content: '服务器CPU使用率超过90%', time: '2024-01-13 14:20', type: 'danger' },
-]
+const loadActiveUsers = async () => {
+  usersLoading.value = true
+  try {
+    const res = await forumUserService.getUserList({
+      page: 1,
+      size: 5,
+      status: 1  // 只显示正常状态的用户
+    })
+    if (res.code === 200) {
+      activeUsers.value = res.data.list || []
+    }
+  } catch (error) {
+    ElMessage.error('加载活跃用户失败')
+  } finally {
+    usersLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadStats()
+  loadRecentPosts()
+  loadActiveUsers()
+})
 </script>
 
 <style scoped>

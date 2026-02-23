@@ -40,6 +40,21 @@ const routes = [
         name: 'MenuManagement',
         component: () => import('../views/MenuManagement.vue')
       },
+      {
+        path: 'forum/post',
+        name: 'ForumPostManagement',
+        component: () => import('../views/ForumPostManagement.vue')
+      },
+      {
+        path: 'forum/board',
+        name: 'ForumBoardManagement',
+        component: () => import('../views/ForumBoardManagement.vue')
+      },
+      {
+        path: 'forum/user',
+        name: 'ForumUserManagement',
+        component: () => import('../views/ForumUserManagement.vue')
+      },
     ]
   }
 ]
