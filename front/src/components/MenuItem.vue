@@ -18,16 +18,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import {
-  Odometer,
-  Management,
-  Setting,
-  User,
-  Avatar,
-  Document,
-  Monitor,
-  Edit
-} from '@element-plus/icons-vue'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const props = defineProps({
   menu: {
@@ -36,19 +27,19 @@ const props = defineProps({
   }
 })
 
-// 图标映射
-const iconMap = {
-  Odometer,
-  Management,
-  Setting,
-  User,
-  Avatar,
-  Document,
-  Monitor,
-  Edit
-}
-
 const icon = computed(() => {
-  return iconMap[props.menu.icon] || Management
+  // 使用动态图标名称从 Element Plus 图标库中获取图标组件
+  const iconName = props.menu.icon
+
+  if (!iconName) {
+    // 默认图标
+    return ElementPlusIconsVue.Management
+  }
+
+  // 从 ElementPlusIconsVue 中获取对应名称的图标
+  const iconComponent = ElementPlusIconsVue[iconName]
+
+  // 如果找到图标则返回，否则返回默认图标
+  return iconComponent || ElementPlusIconsVue.Management
 })
 </script>
