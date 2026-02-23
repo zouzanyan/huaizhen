@@ -228,10 +228,10 @@ const getMenuList = async () => {
 }
 
 // 构建菜单树
-const buildMenuTree = (menus, parentId = 0) => {
+const buildMenuTree = (menus, parentId = '0') => {
   const result = []
   for (const menu of menus) {
-    if (menu.parentId === parentId) {
+    if (menu.parentId == parentId) {  // 使用 == 而不是 === 来比较字符串和数字
       const children = buildMenuTree(menus, menu.id)
       const node = {
         ...menu,
@@ -245,10 +245,10 @@ const buildMenuTree = (menus, parentId = 0) => {
 }
 
 // 构建菜单树选项（用于上级菜单选择）
-const buildMenuTreeOptions = (menus, parentId = 0) => {
+const buildMenuTreeOptions = (menus, parentId = '0') => {
   const result = []
   for (const menu of menus) {
-    if (menu.parentId === parentId) {
+    if (menu.parentId == parentId) {
       const children = buildMenuTreeOptions(menus, menu.id)
       const node = {
         id: menu.id,
@@ -342,9 +342,9 @@ const handleSubmit = async () => {
     if (valid) {
       try {
         const data = { ...form }
-        // 处理 parentId，如果为 null 或 undefined 则设置为 0
+        // 处理 parentId，如果为 null 或 undefined 则设置为 '0'（字符串）
         if (!data.parentId) {
-          data.parentId = 0
+          data.parentId = '0'
         }
 
         const api = form.id ? menuService.updateMenu : menuService.addMenu
