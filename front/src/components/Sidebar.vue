@@ -1,7 +1,7 @@
 <template>
   <div class="logo-container">
     <el-icon class="logo-icon"><Management /></el-icon>
-    <span v-if="!isCollapse" class="logo-text">管理系统</span>
+    <span v-if="!isCollapse" class="logo-text">HZ管理系统</span>
   </div>
   <el-menu
     :default-active="activeMenu"
@@ -59,7 +59,7 @@ onMounted(() => {
 <style scoped>
 .logo-container {
   height: 56px;
-  background-color: #003A6E;
+  background-color: #37658d;
   display: flex;
   align-items: center;
   padding: 0 20px;
