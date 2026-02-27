@@ -2,12 +2,11 @@
   <div class="login-container">
     <el-card class="login-card">
       <h2 class="login-title">系统登录</h2>
-      <el-form ref="loginFormRef" :model="loginForm" :rules="rules">
+      <el-form ref="loginFormRef" :model="loginForm" :rules="rules" class="login-form">
         <el-form-item prop="username">
           <el-input
             v-model="loginForm.username"
             placeholder="请输入用户名"
-            size="large"
           >
             <template #prefix>
               <el-icon><User /></el-icon>
@@ -19,7 +18,6 @@
             v-model="loginForm.password"
             type="password"
             placeholder="请输入密码"
-            size="large"
             show-password
           >
             <template #prefix>
@@ -30,7 +28,6 @@
         <el-form-item>
           <el-button
             type="primary"
-            size="large"
             style="width: 100%"
             :loading="loading"
             @click="handleLogin"
@@ -101,13 +98,21 @@ const handleLogin = async () => {
 }
 
 .login-card {
-  width: 400px;
-  padding: 20px;
+  width: 320px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .login-title {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: #333;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.login-form :deep(.el-form-item) {
+  margin-bottom: 18px;
 }
 </style>
