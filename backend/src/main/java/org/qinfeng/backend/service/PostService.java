@@ -42,4 +42,9 @@ public interface PostService {
      * 获取帖子统计信息
      */
     Map<String, Object> getPostStats();
+
+    /**
+     * 创建帖子
+     */
+    Long createPost(Post post);
 }

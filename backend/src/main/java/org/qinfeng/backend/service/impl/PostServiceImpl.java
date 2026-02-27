@@ -8,6 +8,7 @@ import org.qinfeng.backend.mapper.PostMapper;
 import org.qinfeng.backend.service.PostService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,5 +91,19 @@ public class PostServiceImpl implements PostService {
         stats.put("deletedPosts", deletedPosts);
 
         return stats;
+    }
+
+    @Override
+    public Long createPost(Post post) {
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
+        if (post.getStatus() == null) {
+            post.setStatus((short) 1);
+        }
+        if (post.getContentType() == null) {
+            post.setContentType(0);
+        }
+        postMapper.insert(post);
+        return post.getId();
     }
 }

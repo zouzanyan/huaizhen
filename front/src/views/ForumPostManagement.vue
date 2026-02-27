@@ -36,6 +36,7 @@
         </el-select>
         <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
         <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+        <el-button type="success" :icon="Plus" @click="handleShowCreateDialog">新增贴文</el-button>
         <el-button
           type="danger"
           :icon="Delete"
@@ -114,22 +115,128 @@
         </el-descriptions>
       </div>
     </el-dialog>
+
+    <!-- 创建贴文弹窗 -->
+    <el-dialog
+      v-model="createDialogVisible"
+      title="新增贴文"
+      width="700px"
+      @close="handleCloseCreateDialog"
+    >
+      <el-form
+        ref="createFormRef"
+        :model="createForm"
+        :rules="createFormRules"
+        label-width="80px"
+      >
+        <el-form-item label="版块" prop="forumId">
+          <el-select
+            v-model="createForm.forumId"
+            placeholder="请选择版块"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="forum in forumList"
+              :key="forum.id"
+              :label="forum.name"
+              :value="forum.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="作者" prop="userId">
+          <el-select
+            v-model="createForm.userId"
+            placeholder="请选择作者"
+            filterable
+            style="width: 100%"
+          >
+            <el-option
+              v-for="user in userList"
+              :key="user.id"
+              :label="user.username"
+              :value="user.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="标题" prop="title">
+          <el-input
+            v-model="createForm.title"
+            placeholder="请输入标题"
+            maxlength="100"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="内容" prop="content">
+          <el-input
+            v-model="createForm.content"
+            type="textarea"
+            placeholder="请输入内容"
+            :rows="8"
+            maxlength="5000"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="内容类型">
+          <el-radio-group v-model="createForm.contentType">
+            <el-radio :value="0">普通文本</el-radio>
+            <el-radio :value="1">Markdown</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="createForm.status">
+            <el-radio :value="1">正常</el-radio>
+            <el-radio :value="0">已删除</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="handleCloseCreateDialog">取消</el-button>
+        <el-button type="primary" @click="handleCreatePost">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, View } from '@element-plus/icons-vue'
+import { Search, Refresh, View, Plus, Delete } from '@element-plus/icons-vue'
 import forumPostService from '@/services/forumPost'
 import forumBoardService from '@/services/forumBoard'
+import forumUserService from '@/services/forumUser'
 
 const loading = ref(false)
 const tableData = ref([])
 const forumList = ref([])
+const userList = ref([])
 const selectedIds = ref([])
 const detailDialogVisible = ref(false)
+const createDialogVisible = ref(false)
 const currentPost = ref(null)
+
+// 创建表单
+const createFormRef = ref()
+const createForm = reactive({
+  forumId: null,
+  userId: null,
+  title: '',
+  content: '',
+  contentType: 0,
+  status: 1
+})
+
+const createFormRules = {
+  forumId: [{ required: true, message: '请选择版块', trigger: 'change' }],
+  userId: [{ required: true, message: '请选择作者', trigger: 'change' }],
+  title: [
+    { required: true, message: '请输入标题', trigger: 'blur' },
+    { min: 2, max: 100, message: '标题长度在 2 到 100 个字符', trigger: 'blur' }
+  ],
+  content: [
+    { required: true, message: '请输入内容', trigger: 'blur' },
+    { min: 5, message: '内容至少 5 个字符', trigger: 'blur' }
+  ]
+}
 
 const searchForm = reactive({
   keyword: '',
@@ -157,6 +264,17 @@ const loadForumList = async () => {
     }
   } catch (error) {
     console.error('加载版块列表失败:', error)
+  }
+}
+
+const loadUserList = async () => {
+  try {
+    const res = await forumUserService.getUserList({ page: 1, size: 1000 })
+    if (res.code === 200) {
+      userList.value = res.data.list || []
+    }
+  } catch (error) {
+    console.error('加载用户列表失败:', error)
   }
 }
 
@@ -254,8 +372,42 @@ const handleBatchDelete = async () => {
   }
 }
 
+const handleShowCreateDialog = () => {
+  Object.assign(createForm, {
+    forumId: null,
+    userId: null,
+    title: '',
+    content: '',
+    contentType: 0,
+    status: 1
+  })
+  createDialogVisible.value = true
+}
+
+const handleCloseCreateDialog = () => {
+  createDialogVisible.value = false
+  createFormRef.value?.resetFields()
+}
+
+const handleCreatePost = async () => {
+  try {
+    await createFormRef.value.validate()
+    const res = await forumPostService.createPost(createForm)
+    if (res.code === 200) {
+      ElMessage.success('创建成功')
+      createDialogVisible.value = false
+      loadData()
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('创建失败')
+    }
+  }
+}
+
 onMounted(() => {
   loadForumList()
+  loadUserList()
   loadData()
 })
 </script>

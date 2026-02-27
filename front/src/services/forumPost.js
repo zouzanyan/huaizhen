@@ -74,6 +74,18 @@ class ForumPostService {
       method: 'get'
     })
   }
+
+  /**
+   * 创建帖子
+   * @param {Object} data 帖子数据 { forumId, userId, title, content, contentType, status }
+   */
+  createPost(data) {
+    return request({
+      url: `${API_URL}`,
+      method: 'post',
+      data
+    })
+  }
 }
 
 export default new ForumPostService()

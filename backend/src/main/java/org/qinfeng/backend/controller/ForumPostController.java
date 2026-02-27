@@ -97,4 +97,13 @@ public class ForumPostController {
         Map<String, Object> stats = postService.getPostStats();
         return Result.success(stats);
     }
+
+    /**
+     * 创建帖子
+     */
+    @PostMapping
+    public Result<Long> createPost(@RequestBody Post post) {
+        Long postId = postService.createPost(post);
+        return Result.success("创建成功", postId);
+    }
 }
