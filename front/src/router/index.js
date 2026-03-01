@@ -55,6 +55,11 @@ const routes = [
         name: 'ForumUserManagement',
         component: () => import('../views/ForumUserManagement.vue')
       },
+      {
+        path: 'mock/data',
+        name: 'MockData',
+        component: () => import('../views/MockData.vue')
+      },
     ]
   }
 ]
