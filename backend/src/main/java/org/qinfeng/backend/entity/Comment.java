@@ -30,10 +30,13 @@ public class Comment implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long postId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long parentId;
 
     private String content;
