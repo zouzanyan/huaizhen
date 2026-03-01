@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep -B1 \"@JsonSerialize\" src/main/java/org/qinfeng/backend/entity/*.java)",
+      "Bash(grep -A1 \"@JsonSerialize\" src/main/java/org/qinfeng/backend/entity/*.java)"
     ]
   }
 }
