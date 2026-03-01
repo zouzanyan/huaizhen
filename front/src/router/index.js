@@ -56,6 +56,11 @@ const routes = [
         component: () => import('../views/ForumUserManagement.vue')
       },
       {
+        path: 'forum/comment',
+        name: 'ForumCommentManagement',
+        component: () => import('../views/ForumCommentManagement.vue')
+      },
+      {
         path: 'mock/data',
         name: 'MockData',
         component: () => import('../views/MockData.vue')

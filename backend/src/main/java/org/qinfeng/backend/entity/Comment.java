@@ -2,6 +2,8 @@ package org.qinfeng.backend.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author qinfeng
@@ -25,6 +27,7 @@ public class Comment implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     private Long postId;
@@ -36,8 +39,6 @@ public class Comment implements Serializable {
     private String content;
 
     private Short status;
-
-    private Integer likes;
 
     private LocalDateTime createdAt;
 

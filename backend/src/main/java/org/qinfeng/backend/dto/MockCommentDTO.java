@@ -35,9 +35,4 @@ public class MockCommentDTO {
      * 状态（0-隐藏，1-显示，默认：1）
      */
     private Short status;
-
-    /**
-     * 点赞数（可选，默认：0）
-     */
-    private Integer likes;
 }

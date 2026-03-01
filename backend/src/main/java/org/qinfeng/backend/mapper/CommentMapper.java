@@ -35,7 +35,7 @@ public interface CommentMapper extends BaseMapper<Comment> {
         ORDER BY c.created_at
     """)
     List<CommentVO> listByPostId(@Param("postId") Long postId);
-    
+
     @Select("""
         SELECT
             c.id            AS id,

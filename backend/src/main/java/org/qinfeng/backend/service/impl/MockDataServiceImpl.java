@@ -174,7 +174,6 @@ public class MockDataServiceImpl implements MockDataService {
         comment.setParentId(commentDTO.getParentId());
         comment.setContent(commentDTO.getContent());
         comment.setStatus(commentDTO.getStatus() != null ? commentDTO.getStatus() : (short) 1);
-        comment.setLikes(commentDTO.getLikes() != null ? commentDTO.getLikes() : 0);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
 
