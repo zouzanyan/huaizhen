@@ -89,6 +89,11 @@ public class ForumUserServiceImpl implements ForumUserService {
     }
 
     @Override
+    public boolean updateUser(User user) {
+        return usersMapper.updateById(user) > 0;
+    }
+
+    @Override
     public Map<String, Object> getUserStats() {
         Map<String, Object> stats = new HashMap<>();
 

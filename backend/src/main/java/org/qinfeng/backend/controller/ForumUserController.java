@@ -90,6 +90,16 @@ public class ForumUserController {
     }
 
     /**
+     * 更新用户信息
+     */
+    @PutMapping("/{id}")
+    public Result<Void> updateUser(@PathVariable Long id, @RequestBody User user) {
+        user.setId(id);
+        boolean success = forumUserService.updateUser(user);
+        return success ? Result.success("更新成功") : Result.error("更新失败");
+    }
+
+    /**
      * 获取用户统计信息
      */
     @GetMapping("/stats")

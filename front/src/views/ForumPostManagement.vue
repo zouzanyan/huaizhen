@@ -72,14 +72,8 @@
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" :icon="View" @click="handleView(row)">查看</el-button>
-            <el-button
-              link
-              :type="row.status === 1 ? 'warning' : 'success'"
-              @click="handleToggleStatus(row)"
-            >
-              {{ row.status === 1 ? '删除' : '恢复' }}
-            </el-button>
+            <el-button link type="primary" :icon="Edit" @click="handleEdit(row)">编辑</el-button>
+            <el-button link type="danger" :icon="Delete" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -96,30 +90,10 @@
       </div>
     </el-card>
 
-    <!-- 查看详情弹窗 -->
-    <el-dialog
-      v-model="detailDialogVisible"
-      title="帖子详情"
-      width="800px"
-    >
-      <div v-if="currentPost">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="帖子ID">{{ currentPost.id }}</el-descriptions-item>
-          <el-descriptions-item label="版块">{{ currentPost.forumName }}</el-descriptions-item>
-          <el-descriptions-item label="标题" :span="2">{{ currentPost.title }}</el-descriptions-item>
-          <el-descriptions-item label="作者">{{ currentPost.authorName }}</el-descriptions-item>
-          <el-descriptions-item label="创建时间">{{ formatDateTime(currentPost.createdAt) }}</el-descriptions-item>
-          <el-descriptions-item label="内容" :span="2">
-            <div class="post-content">{{ currentPost.content }}</div>
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
-    </el-dialog>
-
-    <!-- 创建贴文弹窗 -->
+    <!-- 创建/编辑弹窗 -->
     <el-dialog
       v-model="createDialogVisible"
-      title="新增贴文"
+      :title="dialogTitle"
       width="700px"
       @close="handleCloseCreateDialog"
     >
@@ -191,16 +165,16 @@
       </el-form>
       <template #footer>
         <el-button @click="handleCloseCreateDialog">取消</el-button>
-        <el-button type="primary" @click="handleCreatePost">确定</el-button>
+        <el-button type="primary" @click="handleSubmitPost">确定</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, View, Plus, Delete } from '@element-plus/icons-vue'
+import { Search, Refresh, Plus, Delete, Edit } from '@element-plus/icons-vue'
 import forumPostService from '@/services/forumPost'
 import forumBoardService from '@/services/forumBoard'
 import forumUserService from '@/services/forumUser'
@@ -210,13 +184,12 @@ const tableData = ref([])
 const forumList = ref([])
 const userList = ref([])
 const selectedIds = ref([])
-const detailDialogVisible = ref(false)
 const createDialogVisible = ref(false)
-const currentPost = ref(null)
 
-// 创建表单
+// 创建/编辑表单
 const createFormRef = ref()
 const createForm = reactive({
+  id: null,
   forumId: null,
   userId: null,
   title: '',
@@ -224,6 +197,8 @@ const createForm = reactive({
   contentType: 0,
   status: 1
 })
+
+const dialogTitle = computed(() => createForm.id ? '编辑贴文' : '新增贴文')
 
 const createFormRules = {
   forumId: [{ required: true, message: '请选择版块', trigger: 'change' }],
@@ -320,35 +295,46 @@ const handleSelectionChange = (selection) => {
   selectedIds.value = selection.map(item => item.id)
 }
 
-const handleView = async (row) => {
+// 编辑帖子
+const handleEdit = async (row) => {
   try {
     const res = await forumPostService.getPostById(row.id)
     if (res.code === 200) {
-      currentPost.value = res.data
-      detailDialogVisible.value = true
+      const post = res.data
+      Object.assign(createForm, {
+        id: post.id,
+        forumId: post.forumId,
+        userId: post.userId,
+        title: post.title,
+        content: post.content,
+        contentType: post.contentType,
+        status: post.status
+      })
+      createDialogVisible.value = true
     }
   } catch (error) {
-    ElMessage.error('加载详情失败')
+    ElMessage.error('加载帖子信息失败')
   }
 }
 
-const handleToggleStatus = async (row) => {
-  const newStatus = row.status === 1 ? 0 : 1
-  const action = newStatus === 0 ? '删除' : '恢复'
-
+const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm(`确定要${action}该帖子吗？`, '提示', {
-      type: 'warning'
+    await ElMessageBox.confirm('确定要删除该帖子吗？删除后将无法恢复！', '提示', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
     })
 
-    const res = await forumPostService.updatePostStatus(row.id, newStatus)
+    const res = await forumPostService.updatePostStatus(row.id, 0)
     if (res.code === 200) {
-      ElMessage.success(`${action}成功`)
+      ElMessage.success('删除成功')
       loadData()
+    } else {
+      ElMessage.error(res.message || '删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error(`${action}失败`)
+      ElMessage.error('删除失败')
     }
   }
 }
@@ -374,6 +360,7 @@ const handleBatchDelete = async () => {
 
 const handleShowCreateDialog = () => {
   Object.assign(createForm, {
+    id: null,
     forumId: null,
     userId: null,
     title: '',
@@ -389,18 +376,24 @@ const handleCloseCreateDialog = () => {
   createFormRef.value?.resetFields()
 }
 
-const handleCreatePost = async () => {
+// 提交创建或编辑
+const handleSubmitPost = async () => {
   try {
     await createFormRef.value.validate()
-    const res = await forumPostService.createPost(createForm)
+
+    const api = createForm.id ? forumPostService.updatePost : forumPostService.createPost
+    const res = await api(createForm)
+
     if (res.code === 200) {
-      ElMessage.success('创建成功')
+      ElMessage.success(createForm.id ? '更新成功' : '创建成功')
       createDialogVisible.value = false
       loadData()
+    } else {
+      ElMessage.error(res.message || '操作失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('创建失败')
+      ElMessage.error('操作失败')
     }
   }
 }

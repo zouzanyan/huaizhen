@@ -86,6 +86,18 @@ class ForumPostService {
       data
     })
   }
+
+  /**
+   * 更新帖子
+   * @param {Object} data 帖子数据 { id, forumId, userId, title, content, contentType, status }
+   */
+  updatePost(data) {
+    return request({
+      url: `${API_URL}`,
+      method: 'put',
+      data
+    })
+  }
 }
 
 export default new ForumPostService()

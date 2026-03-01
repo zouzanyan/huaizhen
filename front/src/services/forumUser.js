@@ -56,6 +56,19 @@ class ForumUserService {
   }
 
   /**
+   * 更新用户信息
+   * @param {Number} id 用户ID
+   * @param {Object} data 用户数据 { nickname, email, avatarUrl, role, status }
+   */
+  updateUser(id, data) {
+    return request({
+      url: `${API_URL}/${id}`,
+      method: 'put',
+      data
+    })
+  }
+
+  /**
    * 获取用户统计信息
    */
   getUserStats() {

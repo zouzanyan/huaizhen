@@ -47,4 +47,9 @@ public interface PostService {
      * 创建帖子
      */
     Long createPost(Post post);
+
+    /**
+     * 更新帖子
+     */
+    boolean updatePost(Post post);
 }

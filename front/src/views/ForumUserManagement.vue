@@ -58,17 +58,10 @@
             {{ formatDateTime(row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" :icon="View" @click="handleView(row)">查看</el-button>
-            <el-button
-              link
-              :type="row.status === 1 ? 'warning' : 'success'"
-              @click="handleToggleStatus(row)"
-            >
-              {{ row.status === 1 ? '封禁' : '解封' }}
-            </el-button>
-            <el-button link type="primary" :icon="Edit" @click="handleEditRole(row)">角色</el-button>
+            <el-button link type="primary" :icon="Edit" @click="handleEdit(row)">编辑</el-button>
+            <el-button link type="danger" :icon="Delete" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -85,55 +78,47 @@
       </div>
     </el-card>
 
-    <!-- 查看详情弹窗 -->
+    <!-- 编辑用户弹窗 -->
     <el-dialog
-      v-model="detailDialogVisible"
-      title="用户详情"
-      width="600px"
+      v-model="editDialogVisible"
+      title="编辑用户"
+      width="500px"
+      @close="handleCloseEditDialog"
     >
-      <div v-if="currentUser">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="用户ID">{{ currentUser.id }}</el-descriptions-item>
-          <el-descriptions-item label="用户名">{{ currentUser.username }}</el-descriptions-item>
-          <el-descriptions-item label="昵称">{{ currentUser.nickname || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="邮箱">{{ currentUser.email || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="角色">
-            <el-tag :type="currentUser.role === 1 ? 'warning' : 'info'">
-              {{ currentUser.role === 1 ? '管理员' : '普通用户' }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="状态">
-            <el-tag :type="currentUser.status === 1 ? 'success' : 'danger'">
-              {{ currentUser.status === 1 ? '正常' : '已封禁' }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="注册时间" :span="2">
-            {{ formatDateTime(currentUser.createdAt) }}
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
-    </el-dialog>
-
-    <!-- 编辑角色弹窗 -->
-    <el-dialog
-      v-model="roleDialogVisible"
-      title="修改角色"
-      width="400px"
-    >
-      <el-form :model="roleForm" label-width="80px">
+      <el-form
+        ref="editFormRef"
+        :model="editForm"
+        :rules="editFormRules"
+        label-width="80px"
+      >
         <el-form-item label="用户名">
-          <el-input v-model="roleForm.username" disabled />
+          <el-input v-model="editForm.username" disabled />
         </el-form-item>
-        <el-form-item label="角色">
-          <el-radio-group v-model="roleForm.role">
+        <el-form-item label="昵称" prop="nickname">
+          <el-input v-model="editForm.nickname" placeholder="请输入昵称" clearable />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email" placeholder="请输入邮箱" clearable />
+        </el-form-item>
+        <el-form-item label="头像URL">
+          <el-input v-model="editForm.avatarUrl" placeholder="请输入头像URL" clearable />
+        </el-form-item>
+        <el-form-item label="角色" prop="role">
+          <el-radio-group v-model="editForm.role">
             <el-radio :value="0">普通用户</el-radio>
             <el-radio :value="1">管理员</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="editForm.status">
+            <el-radio :value="1">正常</el-radio>
+            <el-radio :value="0">已封禁</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="roleDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleRoleSubmit">确定</el-button>
+        <el-button @click="editDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmitEdit">确定</el-button>
       </template>
     </el-dialog>
   </div>
@@ -142,14 +127,13 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, View, Edit } from '@element-plus/icons-vue'
+import { Search, Refresh, Edit, Delete } from '@element-plus/icons-vue'
 import forumUserService from '@/services/forumUser'
 
 const loading = ref(false)
 const tableData = ref([])
-const detailDialogVisible = ref(false)
-const roleDialogVisible = ref(false)
-const currentUser = ref(null)
+const editDialogVisible = ref(false)
+const editFormRef = ref(null)
 
 const searchForm = reactive({
   keyword: '',
@@ -163,11 +147,25 @@ const pagination = reactive({
   total: 0
 })
 
-const roleForm = reactive({
+// 编辑表单
+const editForm = reactive({
   id: null,
   username: '',
-  role: 0
+  nickname: '',
+  email: '',
+  avatarUrl: '',
+  role: 0,
+  status: 1
 })
+
+const editFormRules = {
+  nickname: [
+    { max: 50, message: '昵称长度不能超过50个字符', trigger: 'blur' }
+  ],
+  email: [
+    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+  ]
+}
 
 const formatDateTime = (dateStr) => {
   if (!dateStr) return '-'
@@ -213,57 +211,79 @@ const handlePageChange = () => {
   loadData()
 }
 
-const handleView = async (row) => {
+const handleDelete = async (row) => {
   try {
-    const res = await forumUserService.getUserById(row.id)
-    if (res.code === 200) {
-      currentUser.value = res.data
-      detailDialogVisible.value = true
-    }
-  } catch (error) {
-    ElMessage.error('加载详情失败')
-  }
-}
-
-const handleToggleStatus = async (row) => {
-  const newStatus = row.status === 1 ? 0 : 1
-  const action = newStatus === 0 ? '封禁' : '解封'
-
-  try {
-    await ElMessageBox.confirm(`确定要${action}该用户吗？`, '提示', {
-      type: 'warning'
+    await ElMessageBox.confirm('确定要删除该用户吗？删除后将无法恢复！', '提示', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
     })
 
-    const res = await forumUserService.updateUserStatus(row.id, newStatus)
+    const res = await forumUserService.updateUserStatus(row.id, 0)
     if (res.code === 200) {
-      ElMessage.success(`${action}成功`)
+      ElMessage.success('删除成功')
       loadData()
+    } else {
+      ElMessage.error(res.message || '删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error(`${action}失败`)
+      ElMessage.error('删除失败')
     }
   }
 }
 
-const handleEditRole = (row) => {
-  roleForm.id = row.id
-  roleForm.username = row.username
-  roleForm.role = row.role
-  roleDialogVisible.value = true
-}
-
-const handleRoleSubmit = async () => {
+// 编辑用户
+const handleEdit = async (row) => {
   try {
-    const res = await forumUserService.updateUserRole(roleForm.id, roleForm.role)
+    const res = await forumUserService.getUserById(row.id)
     if (res.code === 200) {
-      ElMessage.success('修改角色成功')
-      roleDialogVisible.value = false
-      loadData()
+      const user = res.data
+      Object.assign(editForm, {
+        id: user.id,
+        username: user.username,
+        nickname: user.nickname || '',
+        email: user.email || '',
+        avatarUrl: user.avatarUrl || '',
+        role: user.role,
+        status: user.status
+      })
+      editDialogVisible.value = true
     }
   } catch (error) {
-    ElMessage.error('修改角色失败')
+    ElMessage.error('加载用户信息失败')
   }
+}
+
+const handleCloseEditDialog = () => {
+  editDialogVisible.value = false
+  editFormRef.value?.resetFields()
+}
+
+const handleSubmitEdit = async () => {
+  if (!editFormRef.value) return
+  await editFormRef.value.validate(async (valid) => {
+    if (valid) {
+      try {
+        const res = await forumUserService.updateUser(editForm.id, {
+          nickname: editForm.nickname,
+          email: editForm.email,
+          avatarUrl: editForm.avatarUrl,
+          role: editForm.role,
+          status: editForm.status
+        })
+        if (res.code === 200) {
+          ElMessage.success('更新成功')
+          editDialogVisible.value = false
+          loadData()
+        } else {
+          ElMessage.error(res.message || '更新失败')
+        }
+      } catch (error) {
+        ElMessage.error('更新失败')
+      }
+    }
+  })
 }
 
 onMounted(() => {

@@ -106,4 +106,10 @@ public class PostServiceImpl implements PostService {
         postMapper.insert(post);
         return post.getId();
     }
+
+    @Override
+    public boolean updatePost(Post post) {
+        post.setUpdatedAt(LocalDateTime.now());
+        return postMapper.updateById(post) > 0;
+    }
 }

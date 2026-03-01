@@ -34,6 +34,11 @@ public interface ForumUserService {
     boolean updateUserRole(Long id, Short role);
 
     /**
+     * 更新用户信息
+     */
+    boolean updateUser(User user);
+
+    /**
      * 获取用户统计信息
      */
     Map<String, Object> getUserStats();

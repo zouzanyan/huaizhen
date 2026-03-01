@@ -106,4 +106,17 @@ public class ForumPostController {
         Long postId = postService.createPost(post);
         return Result.success("创建成功", postId);
     }
+
+    /**
+     * 更新帖子
+     */
+    @PutMapping
+    public Result<Void> updatePost(@RequestBody Post post) {
+        if (post.getId() == null) {
+            return Result.error("帖子ID不能为空");
+        }
+
+        boolean success = postService.updatePost(post);
+        return success ? Result.success("更新成功") : Result.error("更新失败");
+    }
 }
