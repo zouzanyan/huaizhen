@@ -1,5 +1,7 @@
 package org.qinfeng.backend.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 /**
@@ -14,11 +16,13 @@ public class MockPostDTO {
     /**
      * 版块ID（必填）
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long forumId;
 
     /**
      * 用户ID（必填）
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**

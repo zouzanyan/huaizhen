@@ -52,8 +52,8 @@ public class MockDataController {
      * 创建点赞
      */
     @PostMapping("/like")
-    public Result<Void> createLike(@RequestParam Long postId, @RequestParam Long userId) {
-        mockDataService.createLike(postId, userId);
+    public Result<Void> createLike(@RequestParam String postId, @RequestParam String userId) {
+        mockDataService.createLike(Long.parseLong(postId), Long.parseLong(userId));
         return Result.success("点赞成功");
     }
 
@@ -61,8 +61,8 @@ public class MockDataController {
      * 创建收藏
      */
     @PostMapping("/favorite")
-    public Result<Void> createFavorite(@RequestParam Long postId, @RequestParam Long userId) {
-        mockDataService.createFavorite(postId, userId);
+    public Result<Void> createFavorite(@RequestParam String postId, @RequestParam String userId) {
+        mockDataService.createFavorite(Long.parseLong(postId), Long.parseLong(userId));
         return Result.success("收藏成功");
     }
 

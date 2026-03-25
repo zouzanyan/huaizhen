@@ -1,5 +1,7 @@
 package org.qinfeng.backend.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 /**
@@ -14,16 +16,19 @@ public class MockCommentDTO {
     /**
      * 帖子ID（必填）
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long postId;
 
     /**
      * 用户ID（必填）
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long userId;
 
     /**
      * 父评论ID（可选，不传则为顶层评论，传值则为回复）
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long parentId;
 
     /**

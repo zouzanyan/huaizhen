@@ -113,23 +113,23 @@
         <el-tab-pane label="创建帖子" name="post">
           <el-form :model="postForm" label-width="100px" label-position="left">
             <el-form-item label="版块ID" required>
-              <el-input-number
+              <el-input
                 v-model="postForm.forumId"
-                :min="1"
                 placeholder="请输入版块ID"
+                clearable
               />
               <el-text size="small" type="info" style="margin-left: 10px">
-                提示：先去版块管理查看可用版块ID
+                提示：先去版块管理查看可用版块ID（支持复制粘贴）
               </el-text>
             </el-form-item>
             <el-form-item label="用户ID" required>
-              <el-input-number
+              <el-input
                 v-model="postForm.userId"
-                :min="1"
                 placeholder="请输入用户ID"
+                clearable
               />
               <el-text size="small" type="info" style="margin-left: 10px">
-                提示：使用上面创建的用户ID
+                提示：使用上面创建的用户ID（支持复制粘贴）
               </el-text>
             </el-form-item>
             <el-form-item label="标题" required>
@@ -172,24 +172,24 @@
         <el-tab-pane label="创建评论" name="comment">
           <el-form :model="commentForm" label-width="100px" label-position="left">
             <el-form-item label="帖子ID" required>
-              <el-input-number
+              <el-input
                 v-model="commentForm.postId"
-                :min="1"
                 placeholder="请输入帖子ID"
+                clearable
               />
             </el-form-item>
             <el-form-item label="用户ID" required>
-              <el-input-number
+              <el-input
                 v-model="commentForm.userId"
-                :min="1"
                 placeholder="请输入用户ID"
+                clearable
               />
             </el-form-item>
             <el-form-item label="父评论ID">
-              <el-input-number
+              <el-input
                 v-model="commentForm.parentId"
-                :min="1"
                 placeholder="留空则为顶层评论，有值则为回复"
+                clearable
               />
               <el-text size="small" type="info" style="margin-left: 10px">
                 留空为评论，填写则为回复
@@ -230,10 +230,10 @@
           <el-form :model="quickForm" label-width="100px" label-position="left">
             <el-divider content-position="left">创建点赞</el-divider>
             <el-form-item label="帖子ID" required>
-              <el-input-number v-model="quickForm.likePostId" :min="1" placeholder="帖子ID" />
+              <el-input v-model="quickForm.likePostId" placeholder="帖子ID" clearable />
             </el-form-item>
             <el-form-item label="用户ID" required>
-              <el-input-number v-model="quickForm.likeUserId" :min="1" placeholder="用户ID" />
+              <el-input v-model="quickForm.likeUserId" placeholder="用户ID" clearable />
             </el-form-item>
             <el-form-item>
               <el-button type="success" :icon="StarFilled" @click="createLike" :loading="loading">
@@ -243,10 +243,10 @@
 
             <el-divider content-position="left">创建收藏</el-divider>
             <el-form-item label="帖子ID" required>
-              <el-input-number v-model="quickForm.favPostId" :min="1" placeholder="帖子ID" />
+              <el-input v-model="quickForm.favPostId" placeholder="帖子ID" clearable />
             </el-form-item>
             <el-form-item label="用户ID" required>
-              <el-input-number v-model="quickForm.favUserId" :min="1" placeholder="用户ID" />
+              <el-input v-model="quickForm.favUserId" placeholder="用户ID" clearable />
             </el-form-item>
             <el-form-item>
               <el-button type="warning" :icon="Star" @click="createFavorite" :loading="loading">
@@ -364,8 +364,8 @@ const userForm = reactive({
 
 // 帖子表单
 const postForm = reactive({
-  forumId: 1,
-  userId: 1,
+  forumId: '',
+  userId: '',
   title: '',
   content: '',
   contentType: 1,
@@ -374,9 +374,9 @@ const postForm = reactive({
 
 // 评论表单
 const commentForm = reactive({
-  postId: 1,
-  userId: 1,
-  parentId: null,
+  postId: '',
+  userId: '',
+  parentId: '',
   content: '',
   likes: 0,
   status: 1
@@ -384,10 +384,10 @@ const commentForm = reactive({
 
 // 快速操作表单
 const quickForm = reactive({
-  likePostId: 1,
-  likeUserId: 1,
-  favPostId: 1,
-  favUserId: 1
+  likePostId: '',
+  likeUserId: '',
+  favPostId: '',
+  favUserId: ''
 })
 
 // 批量生成
@@ -480,8 +480,8 @@ const createPost = async () => {
 
 const resetPostForm = () => {
   Object.assign(postForm, {
-    forumId: 1,
-    userId: 1,
+    forumId: '',
+    userId: '',
     title: '',
     content: '',
     contentType: 1,
@@ -519,9 +519,9 @@ const createComment = async () => {
 
 const resetCommentForm = () => {
   Object.assign(commentForm, {
-    postId: 1,
-    userId: 1,
-    parentId: null,
+    postId: '',
+    userId: '',
+    parentId: '',
     content: '',
     likes: 0,
     status: 1
