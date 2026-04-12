@@ -46,9 +46,19 @@ const routes = [
         component: () => import('../views/KgProjectManagement.vue')
       },
       {
+        path: 'kg/model',
+        name: 'KgModelManagementSelect',
+        component: () => import('../views/KgModelManagement.vue')
+      },
+      {
         path: 'kg/model/:projectId',
         name: 'KgModelManagement',
         component: () => import('../views/KgModelManagement.vue')
+      },
+      {
+        path: 'kg/explore',
+        name: 'KgExploreSelect',
+        component: () => import('../views/KgExplore.vue')
       },
       {
         path: 'kg/explore/:projectId',
@@ -56,9 +66,19 @@ const routes = [
         component: () => import('../views/KgExplore.vue')
       },
       {
+        path: 'kg/corpus',
+        name: 'KgCorpusManagementSelect',
+        component: () => import('../views/KgCorpusManagement.vue')
+      },
+      {
         path: 'kg/corpus/:projectId',
         name: 'KgCorpusManagement',
         component: () => import('../views/KgCorpusManagement.vue')
+      },
+      {
+        path: 'kg/transform',
+        name: 'KgTransformSelect',
+        component: () => import('../views/KgTransform.vue')
       },
       {
         path: 'kg/transform/:projectId',

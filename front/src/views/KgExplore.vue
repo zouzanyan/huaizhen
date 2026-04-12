@@ -1,91 +1,101 @@
 <template>
   <div class="kg-explore">
-    <el-page-header @back="$router.back()" style="margin-bottom: 20px;">
-      <template #content>
-        <span>知识图谱探索 - {{ projectName }}</span>
-      </template>
-    </el-page-header>
+    <div class="page-header">
+      <span class="title">知识图谱探索</span>
+      <el-select v-model="selectedProjectId" placeholder="请选择项目" @change="handleProjectChange" style="width: 300px;">
+        <el-option
+          v-for="project in projectList"
+          :key="project.id"
+          :label="project.name"
+          :value="project.id"
+        />
+      </el-select>
+    </div>
 
-    <el-row :gutter="20">
-      <el-col :span="18">
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>图谱可视化</span>
-              <div>
-                <el-button type="primary" size="small" @click="loadGraphData">刷新</el-button>
-                <el-button type="danger" size="small" @click="handleClearGraph">清空图谱</el-button>
+    <template v-if="selectedProjectId">
+      <el-row :gutter="20" style="margin-top: 20px;">
+        <el-col :span="18">
+          <el-card>
+            <template #header>
+              <div class="card-header">
+                <span>图谱可视化</span>
+                <div>
+                  <el-button type="primary" size="small" @click="loadGraphData">刷新</el-button>
+                  <el-button type="danger" size="small" @click="handleClearGraph">清空图谱</el-button>
+                </div>
+              </div>
+            </template>
+            <div ref="chartRef" class="chart-container" v-loading="chartLoading"></div>
+          </el-card>
+        </el-col>
+
+        <el-col :span="6">
+          <el-card>
+            <template #header>
+              <span>LLM 知识抽取</span>
+            </template>
+            <el-form label-position="top">
+              <el-form-item label="输入文本">
+                <el-input
+                  v-model="extractionText"
+                  type="textarea"
+                  rows="6"
+                  placeholder="请输入需要抽取知识的文本..."
+                />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="handlePreviewExtraction" :loading="previewLoading">
+                  预览抽取结果
+                </el-button>
+                <el-button type="success" @click="handleExtractAndSave" :loading="extractLoading">
+                  抽取并保存
+                </el-button>
+              </el-form-item>
+            </el-form>
+
+            <el-divider />
+
+            <div v-if="previewResult" class="preview-result">
+              <h4>抽取预览</h4>
+              <div class="result-section">
+                <strong>实体：</strong>
+                <el-tag
+                  v-for="(entity, index) in previewResult.entities"
+                  :key="index"
+                  :style="{ backgroundColor: getEntityColor(entity.type), color: '#fff', margin: '2px' }"
+                >
+                  {{ entity.name }} ({{ entity.type }})
+                </el-tag>
+              </div>
+              <div class="result-section" v-if="previewResult.relations && previewResult.relations.length">
+                <strong>关系：</strong>
+                <div v-for="(rel, index) in previewResult.relations" :key="index" class="relation-item">
+                  {{ rel.source }} → <strong>{{ rel.relation }}</strong> → {{ rel.target }}
+                </div>
               </div>
             </div>
-          </template>
-          <div ref="chartRef" class="chart-container" v-loading="chartLoading"></div>
-        </el-card>
-      </el-col>
+          </el-card>
 
-      <el-col :span="6">
-        <el-card>
-          <template #header>
-            <span>LLM 知识抽取</span>
-          </template>
-          <el-form label-position="top">
-            <el-form-item label="输入文本">
-              <el-input
-                v-model="extractionText"
-                type="textarea"
-                rows="6"
-                placeholder="请输入需要抽取知识的文本..."
-              />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="handlePreviewExtraction" :loading="previewLoading">
-                预览抽取结果
-              </el-button>
-              <el-button type="success" @click="handleExtractAndSave" :loading="extractLoading">
-                抽取并保存
-              </el-button>
-            </el-form-item>
-          </el-form>
+          <el-card style="margin-top: 20px;">
+            <template #header>
+              <span>图谱统计</span>
+            </template>
+            <el-descriptions :column="1" size="small">
+              <el-descriptions-item label="节点数量">{{ graphData.nodes?.length || 0 }}</el-descriptions-item>
+              <el-descriptions-item label="关系数量">{{ graphData.edges?.length || 0 }}</el-descriptions-item>
+            </el-descriptions>
+          </el-card>
+        </el-col>
+      </el-row>
+    </template>
 
-          <el-divider />
-
-          <div v-if="previewResult" class="preview-result">
-            <h4>抽取预览</h4>
-            <div class="result-section">
-              <strong>实体：</strong>
-              <el-tag
-                v-for="(entity, index) in previewResult.entities"
-                :key="index"
-                :style="{ backgroundColor: getEntityColor(entity.type), color: '#fff', margin: '2px' }"
-              >
-                {{ entity.name }} ({{ entity.type }})
-              </el-tag>
-            </div>
-            <div class="result-section" v-if="previewResult.relations && previewResult.relations.length">
-              <strong>关系：</strong>
-              <div v-for="(rel, index) in previewResult.relations" :key="index" class="relation-item">
-                {{ rel.source }} → <strong>{{ rel.relation }}</strong> → {{ rel.target }}
-              </div>
-            </div>
-          </div>
-        </el-card>
-
-        <el-card style="margin-top: 20px;">
-          <template #header>
-            <span>图谱统计</span>
-          </template>
-          <el-descriptions :column="1" size="small">
-            <el-descriptions-item label="节点数量">{{ graphData.nodes?.length || 0 }}</el-descriptions-item>
-            <el-descriptions-item label="关系数量">{{ graphData.edges?.length || 0 }}</el-descriptions-item>
-          </el-descriptions>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-empty v-else description="请先选择项目" />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as echarts from 'echarts'
 import kgProject from '@/services/kgProject'
@@ -94,8 +104,9 @@ import kgExtraction from '@/services/kgExtraction'
 import kgEntityType from '@/services/kgEntityType'
 
 const route = useRoute()
-const projectId = computed(() => route.params.projectId)
-const projectName = ref('')
+const router = useRouter()
+const selectedProjectId = ref(null)
+const projectList = ref([])
 const chartRef = ref(null)
 const chartLoading = ref(false)
 const chart = ref(null)
@@ -106,20 +117,32 @@ const extractLoading = ref(false)
 const previewResult = ref(null)
 const entityTypeColors = ref({})
 
-const loadProject = async () => {
+const loadProjectList = async () => {
   try {
-    const res = await kgProject.getById(projectId.value)
+    const res = await kgProject.list({ pageNum: 1, pageSize: 100 })
     if (res.code === 200) {
-      projectName.value = res.data.name
+      projectList.value = res.data.records
+      if (route.params.projectId) {
+        selectedProjectId.value = Number(route.params.projectId)
+      }
     }
   } catch (error) {
-    ElMessage.error('加载项目信息失败')
+    ElMessage.error('加载项目列表失败')
+  }
+}
+
+const handleProjectChange = (projectId) => {
+  if (projectId) {
+    router.replace(`/kg/explore/${projectId}`)
+    loadEntityTypes()
+    loadGraphData()
   }
 }
 
 const loadEntityTypes = async () => {
+  if (!selectedProjectId.value) return
   try {
-    const res = await kgEntityType.listByProjectId(projectId.value)
+    const res = await kgEntityType.listByProjectId(selectedProjectId.value)
     if (res.code === 200) {
       res.data.forEach(et => {
         entityTypeColors.value[et.name] = et.color || '#409EFF'
@@ -131,9 +154,10 @@ const loadEntityTypes = async () => {
 }
 
 const loadGraphData = async () => {
+  if (!selectedProjectId.value) return
   chartLoading.value = true
   try {
-    const res = await kgGraph.getGraphData(projectId.value)
+    const res = await kgGraph.getGraphData(selectedProjectId.value)
     if (res.code === 200) {
       graphData.nodes = res.data.nodes || []
       graphData.edges = res.data.edges || []
@@ -246,7 +270,7 @@ const handlePreviewExtraction = async () => {
   previewLoading.value = true
   try {
     const res = await kgExtraction.previewExtraction({
-      projectId: projectId.value,
+      projectId: selectedProjectId.value,
       text: extractionText.value
     })
     if (res.code === 200) {
@@ -270,7 +294,7 @@ const handleExtractAndSave = async () => {
   extractLoading.value = true
   try {
     const res = await kgExtraction.extractByLlm({
-      projectId: projectId.value,
+      projectId: selectedProjectId.value,
       text: extractionText.value
     })
     if (res.code === 200) {
@@ -294,7 +318,7 @@ const handleExtractAndSave = async () => {
 const handleClearGraph = async () => {
   try {
     await ElMessageBox.confirm('确定要清空该图谱的所有数据吗？此操作不可恢复！', '警告', { type: 'warning' })
-    await kgGraph.clearProjectData(projectId.value)
+    await kgGraph.clearProjectData(selectedProjectId.value)
     ElMessage.success('清空成功')
     loadGraphData()
   } catch (error) {
@@ -304,13 +328,18 @@ const handleClearGraph = async () => {
   }
 }
 
-onMounted(async () => {
-  await loadProject()
-  await loadEntityTypes()
-  await loadGraphData()
-  if (route.query.text) {
-    extractionText.value = route.query.text
+watch(selectedProjectId, (newVal) => {
+  if (newVal) {
+    loadEntityTypes()
+    loadGraphData()
+    if (route.query.text) {
+      extractionText.value = route.query.text
+    }
   }
+})
+
+onMounted(() => {
+  loadProjectList()
   window.addEventListener('resize', () => {
     chart.value?.resize()
   })
@@ -321,21 +350,37 @@ onMounted(async () => {
 .kg-explore {
   padding: 20px;
 }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.chart-container {
+  width: 100%;
+  height: 500px;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.chart-container {
-  width: 100%;
-  height: 600px;
-}
+
 .preview-result {
   margin-top: 10px;
 }
+
 .result-section {
   margin-bottom: 10px;
 }
+
 .relation-item {
   padding: 4px 0;
   color: #666;
