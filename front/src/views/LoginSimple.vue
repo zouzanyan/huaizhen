@@ -58,13 +58,11 @@ const handleSubmit = async (e) => {
 
     console.log('登录响应:', response)
 
-    // 存储 token
-    if (response && response.data && response.data.token) {
-      auth.setToken(response.data.token)
-      console.log('Token 已保存:', response.data.token)
+    if (response && response.token) {
+      auth.setToken(response.token)
+      console.log('Token 已保存:', response.token)
       ElMessage.success('登录成功')
 
-      // 跳转到首页
       await router.push('/')
     } else {
       console.error('响应中没有 token:', response)
