@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-card class="login-card">
-      <h2>系统登录</h2>
+      <h2>元图-系统登录</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="username">用户名：</label>
