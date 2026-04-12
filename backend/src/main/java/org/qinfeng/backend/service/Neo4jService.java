@@ -132,6 +132,50 @@ public class Neo4jService {
         return graphData;
     }
 
+    public long getTotalNodeCount() {
+        try (Session session = neo4jDriver.session()) {
+            String cypher = "MATCH (n) RETURN count(n) as count";
+            Result result = session.run(cypher);
+            if (result.hasNext()) {
+                return result.next().get("count").asLong();
+            }
+            return 0;
+        }
+    }
+
+    public long getTotalRelationCount() {
+        try (Session session = neo4jDriver.session()) {
+            String cypher = "MATCH ()-[r]->() RETURN count(r) as count";
+            Result result = session.run(cypher);
+            if (result.hasNext()) {
+                return result.next().get("count").asLong();
+            }
+            return 0;
+        }
+    }
+
+    public long getNodeCountByProjectId(Long projectId) {
+        try (Session session = neo4jDriver.session()) {
+            String cypher = "MATCH (n {projectId: $projectId}) RETURN count(n) as count";
+            Result result = session.run(cypher, Values.parameters("projectId", projectId));
+            if (result.hasNext()) {
+                return result.next().get("count").asLong();
+            }
+            return 0;
+        }
+    }
+
+    public long getRelationCountByProjectId(Long projectId) {
+        try (Session session = neo4jDriver.session()) {
+            String cypher = "MATCH ()-[r {projectId: $projectId}]->() RETURN count(r) as count";
+            Result result = session.run(cypher, Values.parameters("projectId", projectId));
+            if (result.hasNext()) {
+                return result.next().get("count").asLong();
+            }
+            return 0;
+        }
+    }
+
     private String buildPropertiesString(Map<String, Object> properties) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;

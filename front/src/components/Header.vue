@@ -8,7 +8,7 @@
         <Fold v-if="!isCollapse" />
         <Expand v-else />
       </el-icon>
-      <span class="system-name">Admin System</span>
+      <span class="system-name"></span>
     </div>
 
     <div class="header-right">

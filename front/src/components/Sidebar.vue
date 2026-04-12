@@ -1,7 +1,7 @@
 <template>
   <div class="logo-container">
     <el-icon class="logo-icon"><Management /></el-icon>
-    <span v-if="!isCollapse" class="logo-text">HZ管理系统</span>
+    <span v-if="!isCollapse" class="logo-text">元图</span>
   </div>
   <el-menu
     :default-active="activeMenu"
