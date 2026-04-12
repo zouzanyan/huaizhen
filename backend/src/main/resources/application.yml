@@ -9,4 +9,14 @@ spring:
 
 jwt:
   secret: yourSecretKeyHere123456789892435682439065802934658
-  expiration: 3600000  # 1小时（毫秒）
+  expiration: 3600000
+
+neo4j:
+  uri: bolt://106.75.246.193:7687
+  username: neo4j
+  password:
+
+llm:
+  api-url: https://api.siliconflow.cn/v1/chat/completions
+  api-key:
+  model: Qwen/Qwen3-8B

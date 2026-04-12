@@ -40,6 +40,31 @@ const routes = [
         name: 'MenuManagement',
         component: () => import('../views/MenuManagement.vue')
       },
+      {
+        path: 'kg/project',
+        name: 'KgProjectManagement',
+        component: () => import('../views/KgProjectManagement.vue')
+      },
+      {
+        path: 'kg/model/:projectId',
+        name: 'KgModelManagement',
+        component: () => import('../views/KgModelManagement.vue')
+      },
+      {
+        path: 'kg/explore/:projectId',
+        name: 'KgExplore',
+        component: () => import('../views/KgExplore.vue')
+      },
+      {
+        path: 'kg/corpus/:projectId',
+        name: 'KgCorpusManagement',
+        component: () => import('../views/KgCorpusManagement.vue')
+      },
+      {
+        path: 'kg/transform/:projectId',
+        name: 'KgTransform',
+        component: () => import('../views/KgTransform.vue')
+      },
     ]
   }
 ]
