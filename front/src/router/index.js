@@ -40,6 +40,21 @@ const routes = [
         name: 'MenuManagement',
         component: () => import('../views/MenuManagement.vue')
       },
+      {
+        path: 'prompt',
+        name: 'PromptManagement',
+        component: () => import('../views/PromptManagement.vue')
+      },
+      {
+        path: 'ai/ai-api',
+        name: 'AiApiManagement',
+        component: () => import('../views/AiApiManagement.vue')
+      },
+      {
+        path: 'ai/rewrite',
+        name: 'AiRewrite',
+        component: () => import('../views/AiRewrite.vue')
+      },
     ]
   }
 ]
