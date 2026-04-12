@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 import auth from '@/services/auth'
 
 const service = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 120000, // 2分钟超时，LLM API 响应较慢
   headers: {
     'Content-Type': 'application/json'
