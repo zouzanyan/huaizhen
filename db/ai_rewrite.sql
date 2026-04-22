@@ -26,7 +26,7 @@ CREATE TABLE `ai_rewrite` (
 -- Add menu for AI Rewrite management
 -- ----------------------------
 INSERT INTO `sys_menu` (`name`, `parent_id`, `order_no`, `permission_code`, `status`, `path`, `icon`) 
-VALUES ('仿写管理', (SELECT id FROM (SELECT id FROM sys_menu WHERE name = 'AI配置') AS tmp), 2, 'ai-rewrite:view', 1, '/ai/rewrite', 'Edit');
+VALUES ('仿写管理', (SELECT id FROM (SELECT id FROM sys_menu WHERE name = 'AI配置') AS tmp), 2, 'ai-rewrite:view', 1, '/rewrite', 'Edit');
 
 SET @rewrite_menu_id = LAST_INSERT_ID();
 INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES (1, @rewrite_menu_id);

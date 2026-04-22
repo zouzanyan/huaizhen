@@ -51,7 +51,7 @@ const routes = [
         component: () => import('../views/AiApiManagement.vue')
       },
       {
-        path: 'ai/rewrite',
+        path: 'rewrite',
         name: 'AiRewrite',
         component: () => import('../views/AiRewrite.vue')
       },
