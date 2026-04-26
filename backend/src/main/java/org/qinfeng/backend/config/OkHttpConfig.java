@@ -31,7 +31,7 @@ public class OkHttpConfig {
     @Value("${okhttp.keep-alive-duration:5}")
     private long keepAliveDuration;
 
-    @Value("${okhttp.proxy.enabled:false}")
+    @Value("${okhttp.proxy.enabled:true}")
     private boolean proxyEnabled;
 
     @Value("${okhttp.proxy.host:127.0.0.1}")
