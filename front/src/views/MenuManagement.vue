@@ -436,8 +436,8 @@ onMounted(() => {
 
 .page-title {
   font-size: 20px;
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--app-text);
   margin: 0;
 }
 
@@ -456,9 +456,9 @@ onMounted(() => {
   gap: 12px;
   max-height: 400px;
   overflow-y: auto;
-  border: 1px solid #e4e7ed;
+  border: 1px solid var(--app-border);
   padding: 12px;
-  border-radius: 4px;
+  border-radius: var(--app-radius-sm);
 }
 
 .icon-item {
@@ -466,21 +466,22 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  border: 1px solid #e4e7ed;
-  border-radius: 4px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .icon-item:hover {
-  background-color: #f5f7fa;
-  border-color: #409eff;
+  background-color: var(--app-border-light);
+  border-color: var(--app-primary);
+  color: var(--app-primary);
 }
 
 .icon-item.active {
-  background-color: #ecf5ff;
-  border-color: #409eff;
-  color: #409eff;
+  background-color: var(--app-primary-soft);
+  border-color: var(--app-primary);
+  color: var(--app-primary);
 }
 
 .icon-name {
@@ -491,5 +492,10 @@ onMounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100px;
+}
+
+:deep(.el-card) {
+  border-radius: var(--app-radius-lg);
+  border-color: var(--app-border);
 }
 </style>

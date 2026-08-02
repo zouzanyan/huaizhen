@@ -43,37 +43,38 @@ const toggleCollapse = () => {
 }
 
 .sidebar-aside {
-  background-color: #004E8C;
-  transition: width 0.3s;
-  overflow-x: hidden;
+  background-color: var(--app-sidebar-bg);
+  border-right: 1px solid var(--app-border);
+  transition: width 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
 }
 
 .main-container {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: var(--app-bg);
+  transition: background-color 0.3s ease;
 }
 
 .layout-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 20px;
+  background-color: var(--app-card-bg);
+  border-bottom: 1px solid var(--app-border);
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .layout-main {
-  background-color: #F0F6FF;
-  padding: 20px;
+  background-color: var(--app-bg);
+  padding: 24px;
   overflow-y: auto;
+  transition: background-color 0.3s ease;
 }
 
 .content-wrapper {
-  background-color: #ffffff;
-  border-radius: 4px;
-  padding: 20px;
-  min-height: calc(100vh - 96px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - 104px);
 }
 </style>

@@ -150,15 +150,15 @@ const notifications: Notification[] = [
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 500;
-  color: #111827;
-  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--app-text);
+  margin: 0 0 6px 0;
 }
 
 .page-subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--app-text-secondary);
   margin: 0;
 }
 
@@ -168,6 +168,9 @@ const notifications: Notification[] = [
 
 .stat-card {
   margin-bottom: 0;
+  border-radius: var(--app-radius-lg);
+  border: 1px solid var(--app-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .stat-content {
@@ -177,33 +180,34 @@ const notifications: Notification[] = [
 }
 
 .stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--app-radius);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  flex-shrink: 0;
 }
 
 .stat-icon.primary {
-  background-color: #dbeafe;
-  color: #3b82f6;
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
 }
 
 .stat-icon.success {
-  background-color: #d1fae5;
-  color: #10b981;
+  background-color: var(--el-color-success-light-9);
+  color: var(--el-color-success);
 }
 
 .stat-icon.warning {
-  background-color: #fef3c7;
-  color: #f59e0b;
+  background-color: var(--el-color-warning-light-9);
+  color: var(--el-color-warning);
 }
 
 .stat-icon.danger {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background-color: var(--el-color-danger-light-9);
+  color: var(--el-color-danger);
 }
 
 .stat-info {
@@ -211,16 +215,16 @@ const notifications: Notification[] = [
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--app-text);
   line-height: 1;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 4px;
+  font-size: 13px;
+  color: var(--app-text-secondary);
+  margin-top: 6px;
 }
 
 .content-row {
@@ -228,8 +232,13 @@ const notifications: Notification[] = [
 }
 
 .card-header {
-  font-size: 16px;
-  font-weight: 500;
-  color: #111827;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+:deep(.el-card) {
+  border-radius: var(--app-radius-lg);
+  border-color: var(--app-border);
 }
 </style>

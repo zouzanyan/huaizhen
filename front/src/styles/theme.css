@@ -1,0 +1,178 @@
+/**
+ * 怀真 · 设计系统主题变量
+ * 风格:现代极简(shadcn / Linear 风格)
+ * 主色:Teal / Emerald
+ * 双主题:浅色(:root) + 深色(html.dark)
+ *
+ * 优先级保证:此文件在 main.js 中最后引入,确保覆盖 Element Plus 默认变量。
+ */
+
+:root {
+  /* ===== 品牌主色色阶(Emerald / Teal)===== */
+  --app-primary: #10b981;
+  --app-primary-hover: #34d399;   /* emerald-400 */
+  --app-primary-active: #059669;  /* emerald-600 */
+  --app-primary-soft: #ecfdf5;    /* emerald-50,浅色 tint 背景 */
+
+  /* ===== 表面层 ===== */
+  --app-bg: #f6f7f9;              /* 页面背景(微灰) */
+  --app-sidebar-bg: #ffffff;      /* 侧栏背景 */
+  --app-card-bg: #ffffff;         /* 卡片背景 */
+  --app-overlay-bg: #ffffff;      /* 弹层背景 */
+
+  /* ===== 文字 ===== */
+  --app-text: #18181b;            /* 主文字(zinc-900) */
+  --app-text-secondary: #52525b;  /* 次要文字(zinc-600) */
+  --app-text-tertiary: #a1a1aa;   /* 辅助文字(zinc-400) */
+  --app-text-disabled: #c4c4c8;
+
+  /* ===== 边框 ===== */
+  --app-border: #e4e4e7;          /* zinc-200 */
+  --app-border-light: #f4f4f5;    /* zinc-100 */
+
+  /* ===== 阴影(柔和)===== */
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --app-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --app-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* ===== 圆角 ===== */
+  --app-radius-sm: 6px;
+  --app-radius: 8px;
+  --app-radius-lg: 12px;
+
+  /* ===== Element Plus 变量覆盖(浅色)===== */
+  --el-color-primary: var(--app-primary);
+  --el-color-primary-light-3: var(--app-primary-hover);
+  --el-color-primary-light-5: #6ee7b7;
+  --el-color-primary-light-7: #a7f3d0;
+  --el-color-primary-light-8: #d1fae5;
+  --el-color-primary-light-9: var(--app-primary-soft);
+  --el-color-primary-dark-2: var(--app-primary-active);
+
+  --el-bg-color: var(--app-card-bg);
+  --el-bg-color-page: var(--app-bg);
+  --el-bg-color-overlay: var(--app-overlay-bg);
+
+  --el-text-color-primary: var(--app-text);
+  --el-text-color-regular: var(--app-text-secondary);
+  --el-text-color-secondary: var(--app-text-secondary);
+  --el-text-color-placeholder: var(--app-text-tertiary);
+  --el-text-color-disabled: var(--app-text-disabled);
+
+  --el-border-color: var(--app-border);
+  --el-border-color-light: var(--app-border-light);
+  --el-border-color-lighter: var(--app-border-light);
+  --el-border-color-extra-light: var(--app-border-light);
+
+  --el-fill-color: var(--app-border-light);
+  --el-fill-color-light: var(--app-border-light);
+  --el-fill-color-lighter: #fafafa;
+  --el-fill-color-blank: var(--app-card-bg);
+
+  --el-menu-bg-color: var(--app-sidebar-bg);
+  --el-menu-text-color: var(--app-text-secondary);
+  --el-menu-hover-bg-color: var(--app-border-light);
+  --el-menu-active-color: var(--app-primary);
+
+  --el-box-shadow-light: var(--app-shadow);
+
+  /* 全局字号/字重微调 */
+  --el-font-size-base: 14px;
+
+  /* 圆角:输入框/按钮等略圆,更现代 */
+  --el-border-radius-base: 6px;
+  --el-border-radius-small: 4px;
+
+  /* 移除 el-menu 默认右侧边框(避免与侧栏边框叠成"宽线") */
+  --el-menu-border-color: transparent;
+
+  /* 卡片/弹窗细节 */
+  --el-card-border-color: var(--app-border);
+  --el-card-padding: 20px;
+}
+
+/* ===== 深色模式(zinc 中性深色 + Teal 强调)===== */
+html.dark {
+  /* 品牌主色保持,但 tint 在深色下改用更深的青绿,避免亮色块 */
+  --app-primary-soft: #052e22;
+
+  /* 表面层:页面最暗,侧栏略次,卡片最亮,形成层次 */
+  --app-bg: #09090b;            /* zinc-950 */
+  --app-sidebar-bg: #0c0c0e;
+  --app-card-bg: #18181b;       /* zinc-900 */
+  --app-overlay-bg: #18181b;
+
+  /* 文字(深底浅字) */
+  --app-text: #fafafa;          /* zinc-50 */
+  --app-text-secondary: #a1a1aa;/* zinc-400 */
+  --app-text-tertiary: #71717a; /* zinc-500 */
+  --app-text-disabled: #52525b;
+
+  /* 边框(低对比) */
+  --app-border: #27272a;        /* zinc-800 */
+  --app-border-light: #1f1f22;
+
+  /* 阴影(更深、几乎不可见) */
+  --app-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --app-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --app-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  /* Element Plus 深色覆盖 */
+  --el-color-primary-light-3: var(--app-primary-active);  /* hover 取深 */
+  --el-color-primary-light-5: #047857;
+  --el-color-primary-light-7: #065f46;
+  --el-color-primary-light-8: #064e3b;
+  --el-color-primary-light-9: var(--app-primary-soft);
+  --el-color-primary-dark-2: var(--app-primary-hover);   /* pressed 取浅 */
+
+  --el-bg-color: var(--app-card-bg);
+  --el-bg-color-page: var(--app-bg);
+  --el-bg-color-overlay: var(--app-overlay-bg);
+
+  --el-text-color-primary: var(--app-text);
+  --el-text-color-regular: var(--app-text-secondary);
+  --el-text-color-secondary: var(--app-text-secondary);
+  --el-text-color-placeholder: var(--app-text-tertiary);
+  --el-text-color-disabled: var(--app-text-disabled);
+
+  --el-border-color: var(--app-border);
+  --el-border-color-light: var(--app-border-light);
+  --el-border-color-lighter: var(--app-border-light);
+  --el-border-color-extra-light: var(--app-border-light);
+
+  --el-fill-color: var(--app-border-light);
+  --el-fill-color-light: #1f1f22;
+  --el-fill-color-lighter: #18181b;
+  --el-fill-color-blank: var(--app-card-bg);
+
+  --el-menu-bg-color: var(--app-sidebar-bg);
+  --el-menu-text-color: var(--app-text-secondary);
+  --el-menu-hover-bg-color: #1f1f22;
+  --el-menu-active-color: var(--app-primary);
+
+  --el-box-shadow-light: var(--app-shadow);
+
+  /* Element Plus 颜色色阶在深色下的适配(警告/危险等 tint) */
+  --el-color-warning-light-9: #2a1f08;
+  --el-color-danger-light-9: #2a0f0f;
+  --el-color-success-light-9: #0a2218;
+}
+
+/* ===== Element Plus 组件细节统一 ===== */
+
+/* 卡片:统一大圆角 + 描边,弱化默认阴影 */
+.el-card {
+  border-radius: var(--app-radius-lg);
+  border-color: var(--app-card-border-color, var(--app-border));
+}
+
+/* 弹窗:大圆角,与卡片一致 */
+.el-dialog {
+  border-radius: var(--app-radius-lg);
+  overflow: hidden;
+}
+
+/* 滚动条:菜单/弹层内更纤细 */
+.el-scrollbar__bar {
+  opacity: 0.6;
+}

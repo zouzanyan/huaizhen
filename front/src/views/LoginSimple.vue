@@ -1,32 +1,60 @@
 <template>
   <div class="login-container">
-    <el-card class="login-card">
-      <h2>系统登录</h2>
-      <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <label for="username">用户名：</label>
-          <input
-            id="username"
-            v-model="formData.username"
-            type="text"
-            placeholder="请输入用户名"
-            class="form-input"
-          />
+    <div class="login-glow"></div>
+
+    <!-- 角落主题切换 -->
+    <el-icon class="theme-toggle" @click="toggleTheme">
+      <Moon v-if="theme === 'light'" />
+      <Sunny v-else />
+    </el-icon>
+
+    <el-card class="login-card" shadow="never">
+      <div class="brand">
+        <div class="brand-icon">
+          <el-icon><Management /></el-icon>
         </div>
-        <div class="form-group">
-          <label for="password">密码：</label>
-          <input
-            id="password"
-            v-model="formData.password"
+        <h1 class="brand-title">怀真</h1>
+        <p class="brand-subtitle">管理系统</p>
+      </div>
+
+      <el-form ref="loginFormRef" :model="loginForm" :rules="rules" class="login-form" label-position="top">
+        <el-form-item prop="username">
+          <el-input
+            v-model="loginForm.username"
+            placeholder="请输入用户名"
+            size="large"
+          >
+            <template #prefix>
+              <el-icon><User /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="loginForm.password"
             type="password"
             placeholder="请输入密码"
-            class="form-input"
-          />
-        </div>
-        <button type="submit" class="login-button" :disabled="loading">
-          {{ loading ? '登录中...' : '登录' }}
-        </button>
-      </form>
+            size="large"
+            show-password
+            @keyup.enter="handleLogin"
+          >
+            <template #prefix>
+              <el-icon><Lock /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            size="large"
+            class="login-button"
+            :loading="loading"
+            @click="handleLogin"
+          >
+            登录
+          </el-button>
+        </el-form-item>
+      </el-form>
     </el-card>
   </div>
 </template>
@@ -35,48 +63,49 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { User, Lock, Management, Moon, Sunny } from '@element-plus/icons-vue'
 import auth from '@/services/auth'
+import { useTheme } from '@/composables/useTheme'
+
+const { theme, toggleTheme } = useTheme()
 
 const router = useRouter()
-const formData = ref({
+const loginForm = ref({
   username: '',
   password: ''
 })
 const loading = ref(false)
+const loginFormRef = ref(null)
 
-const handleSubmit = async (e) => {
-  e.preventDefault()
+const rules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+}
 
-  if (!formData.value.username || !formData.value.password) {
-    ElMessage.error('请输入用户名和密码')
-    return
-  }
+const handleLogin = async () => {
+  if (!loginFormRef.value) return
 
   try {
+    await loginFormRef.value.validate()
     loading.value = true
-    const response = await auth.login(formData.value.username, formData.value.password)
 
-    console.log('登录响应:', response)
+    const response = await auth.login(loginForm.value.username, loginForm.value.password)
 
     if (response && response.token) {
       auth.setToken(response.token)
-      console.log('Token 已保存:', response.token)
       ElMessage.success('登录成功')
-
       await router.push('/')
     } else {
-      console.error('响应中没有 token:', response)
-      ElMessage.error('登录失败：服务器响应异常')
+      ElMessage.error('登录失败:服务器响应异常')
     }
   } catch (error) {
-    console.error('登录错误:', error)
-
-    if (error.response) {
+    // 表单校验失败时 error 为 false,不提示网络错误
+    if (error && error.response) {
       ElMessage.error(error.response.data?.message || '登录失败')
-    } else if (error.message) {
+    } else if (error && error.message) {
       ElMessage.error(error.message)
-    } else {
-      ElMessage.error('网络错误，请重试')
+    } else if (error) {
+      ElMessage.error('网络错误,请重试')
     }
   } finally {
     loading.value = false
@@ -90,112 +119,101 @@ const handleSubmit = async (e) => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3d7a9e 100%);
+  background-color: var(--app-bg);
   position: relative;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
-.login-container::before {
-  content: '';
+/* 背景柔和的 teal 光晕(主题自适应) */
+.login-glow {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.02) 50%, transparent 70%);
-  background-size: 100% 100%, 100% 100%, 200% 200%;
-  animation: backgroundMove 20s ease-in-out infinite;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse at center, var(--app-primary-soft) 0%, transparent 65%);
+  opacity: 0.8;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
-@keyframes backgroundMove {
-  0%, 100% {
-    background-position: 0 0, 0 0, 0 0;
-  }
-  50% {
-    background-position: 0 0, 0 0, 50% 50%;
-  }
+.theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--app-text-secondary);
+  z-index: 10;
+  transition: color 0.2s;
+}
+
+.theme-toggle:hover {
+  color: var(--app-primary);
 }
 
 .login-card {
-  width: 420px;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 12px;
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  backdrop-filter: blur(10px);
+  width: 400px;
+  padding: 16px 8px;
+  border-radius: var(--app-radius-lg);
+  border: 1px solid var(--app-border);
+  background-color: var(--app-card-bg);
+  box-shadow: var(--app-shadow-lg);
   position: relative;
   z-index: 1;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.login-card h2 {
+:deep(.login-card .el-card__body) {
+  padding: 32px;
+}
+
+.brand {
   text-align: center;
-  margin-bottom: 30px;
-  color: #333;
+  margin-bottom: 32px;
 }
 
-.form-group {
+.brand-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: var(--app-radius-lg);
+  background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-active) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.brand-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--app-text);
+  margin: 0 0 4px 0;
+  letter-spacing: 0.04em;
+}
+
+.brand-subtitle {
+  font-size: 14px;
+  color: var(--app-text-tertiary);
+  margin: 0;
+}
+
+.login-form :deep(.el-form-item) {
   margin-bottom: 20px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 14px;
-}
-
-.form-input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1.5px solid #e0e6ed;
-  border-radius: 8px;
-  font-size: 15px;
-  box-sizing: border-box;
-  transition: all 0.3s ease;
-  background: #f8f9fb;
-  color: #2c3e50;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #2a5298;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+.login-form :deep(.el-input__wrapper) {
+  border-radius: var(--app-radius);
 }
 
 .login-button {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: var(--app-radius);
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
-}
-
-.login-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2a5298 0%, #3d7a9e 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
-}
-
-.login-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.login-button:disabled {
-  background: #a0cfff;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 </style>

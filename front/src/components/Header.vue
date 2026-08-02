@@ -8,10 +8,14 @@
         <Fold v-if="!isCollapse" />
         <Expand v-else />
       </el-icon>
-      <span class="system-name">Admin System</span>
+      <span class="system-name">怀真 · 管理系统</span>
     </div>
 
     <div class="header-right">
+      <el-icon class="header-action" @click="toggleTheme">
+        <Moon v-if="theme === 'light'" />
+        <Sunny v-else />
+      </el-icon>
       <el-dropdown @command="handleCommand">
         <span class="user-info">
           <el-icon class="user-icon"><UserFilled /></el-icon>
@@ -38,8 +42,9 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Fold, Expand, UserFilled, User, SwitchButton } from '@element-plus/icons-vue'
+import { Fold, Expand, UserFilled, User, SwitchButton, Moon, Sunny } from '@element-plus/icons-vue'
 import auth from '../services/auth'
+import { useTheme } from '../composables/useTheme'
 
 interface Props {
   isCollapse: boolean
@@ -50,6 +55,8 @@ const props = defineProps<Props>()
 defineEmits<{
   toggleCollapse: []
 }>()
+
+const { theme, toggleTheme } = useTheme()
 
 const router = useRouter()
 const username = ref('')
@@ -108,23 +115,36 @@ onMounted(() => {
 .collapse-icon {
   font-size: 20px;
   cursor: pointer;
-  color: #6b7280;
-  transition: color 0.3s;
+  color: var(--app-text-secondary);
+  transition: color 0.2s;
 }
 
 .collapse-icon:hover {
-  color: #111827;
+  color: var(--app-text);
 }
 
 .system-name {
-  font-size: 18px;
-  font-weight: 500;
-  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text);
+  letter-spacing: 0.02em;
 }
 
 .header-right {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.header-action {
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--app-text-secondary);
+  transition: color 0.2s;
+}
+
+.header-action:hover {
+  color: var(--app-primary);
 }
 
 .user-info {
@@ -132,12 +152,13 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: #374151;
-  transition: color 0.3s;
+  color: var(--app-text-secondary);
+  transition: color 0.2s;
+  outline: none;
 }
 
 .user-info:hover {
-  color: #111827;
+  color: var(--app-text);
 }
 
 .user-icon {

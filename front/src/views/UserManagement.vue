@@ -396,8 +396,8 @@ onMounted(() => {
 
 .page-title {
   font-size: 20px;
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--app-text);
   margin: 0;
 }
 
@@ -416,7 +416,12 @@ onMounted(() => {
 
 .form-tip {
   font-size: 12px;
-  color: #909399;
+  color: var(--app-text-tertiary);
   margin-top: 4px;
+}
+
+:deep(.el-card) {
+  border-radius: var(--app-radius-lg);
+  border-color: var(--app-border);
 }
 </style>

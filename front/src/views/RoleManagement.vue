@@ -85,7 +85,7 @@
             default-expand-all
             :default-checked-keys="checkedMenuIds"
             check-strictly
-            style="border: 1px solid #dcdfe6; padding: 10px; border-radius: 4px;"
+            style="border: 1px solid var(--app-border); padding: 10px; border-radius: var(--app-radius-sm);"
           />
         </el-form-item>
       </el-form>
@@ -308,8 +308,13 @@ onMounted(() => {
 
 .page-title {
   font-size: 20px;
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--app-text);
   margin: 0;
+}
+
+:deep(.el-card) {
+  border-radius: var(--app-radius-lg);
+  border-color: var(--app-border);
 }
 </style>

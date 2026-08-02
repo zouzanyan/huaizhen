@@ -129,8 +129,8 @@ onMounted(() => {
 
 .page-title {
   font-size: 20px;
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--app-text);
   margin: 0;
 }
 
@@ -159,13 +159,13 @@ onMounted(() => {
 .roles-section {
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e4e7ed;
+  border-top: 1px solid var(--app-border);
 }
 
 .roles-section h3 {
   margin: 0 0 12px 0;
   font-size: 16px;
-  color: #374151;
+  color: var(--app-text-secondary);
 }
 
 .role-tag {
@@ -174,7 +174,12 @@ onMounted(() => {
 }
 
 .no-roles {
-  color: #9ca3af;
+  color: var(--app-text-tertiary);
   font-style: italic;
+}
+
+:deep(.el-card) {
+  border-radius: var(--app-radius-lg);
+  border-color: var(--app-border);
 }
 </style>
